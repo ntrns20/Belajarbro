@@ -39,7 +39,6 @@
                         skeleton: 'rgba(255, 255, 255, 0.03)',
                     },
                     boxShadow: {
-                        'glow': '0 0 40px -10px rgba(99, 102, 241, 0.15)',
                         'card-hover': '0 20px 40px -15px rgba(0,0,0,0.5), 0 0 20px -5px rgba(255,255,255,0.03)',
                     }
                 }
@@ -113,7 +112,7 @@
         }
 
         .module-card {
-            transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+            transition: all 0.3s ease-out;
         }
 
         .floating-tooltip {
@@ -122,8 +121,8 @@
             left: 50%;
             transform: translateX(-50%) translateY(10px) scale(0.95);
             background-color: rgba(20, 20, 22, 0.85);
-            backdrop-filter: blur(12px);
-            -webkit-backdrop-filter: blur(12px);
+            backdrop-filter: blur(8px);
+            -webkit-backdrop-filter: blur(8px);
             color: #fff;
             padding: 0.5rem 0.8rem;
             border-radius: 0.75rem;
@@ -147,7 +146,7 @@
                 transform: translateX(-50%) translateY(0) scale(1);
             }
             .module-card:hover {
-                transform: translateY(-4px) scale(1.01);
+                transform: translateY(-4px);
                 border-color: rgba(255, 255, 255, 0.15); 
             }
         }
@@ -167,12 +166,12 @@
         }
 
         @keyframes smoothFadeIn {
-            from { opacity: 0; transform: translateY(15px); filter: blur(4px); }
-            to { opacity: 1; transform: translateY(0); filter: blur(0); }
+            from { opacity: 0; transform: translateY(15px); }
+            to { opacity: 1; transform: translateY(0); }
         }
         
         .animate-fade-in {
-            animation: smoothFadeIn 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+            animation: smoothFadeIn 0.5s ease-out forwards;
         }
 
         .nav-wrapper-mask {
@@ -223,35 +222,12 @@
             visibility: hidden !important;
         }
 
-        @keyframes premiumShimmer {
-            0% { background-position: -1000px 0; }
-            100% { background-position: 1000px 0; }
-        }
-        .skeleton-shimmer {
-            background: rgba(255, 255, 255, 0.02);
-            background-image: linear-gradient(90deg, rgba(255, 255, 255, 0.01) 0%, rgba(255, 255, 255, 0.05) 50%, rgba(255, 255, 255, 0.01) 100%);
-            background-repeat: no-repeat;
-            background-size: 1000px 100%;
-            animation: premiumShimmer 2s infinite linear forwards;
-        }
-
         .nav-scroll-grab { cursor: grab; }
         .nav-scroll-grabbing {
             cursor: grabbing !important;
             scroll-behavior: auto !important;
         }
         .nav-scroll-grabbing * { user-select: none; }
-
-        .bg-glow {
-            position: absolute;
-            top: -20%;
-            left: -10%;
-            width: 70vw;
-            height: 70vw;
-            background: radial-gradient(circle, rgba(99,102,241,0.08) 0%, rgba(0,0,0,0) 70%);
-            pointer-events: none;
-            z-index: 0;
-        }
     </style>
     <script>
         // GLOBAL CONSTANTS: Offline Asset Fallback (Base64 SVG Avatar)
@@ -269,19 +245,17 @@
     </div>
 
     <div id="app-wrapper" class="app-initializing flex flex-col h-full w-full relative">
-        <div class="bg-glow"></div>
-
-        <div id="offline-toast" style="top: max(1rem, env(safe-area-inset-top));" class="fixed left-1/2 -translate-x-1/2 z-50 bg-rose-500/90 text-white px-5 py-3 rounded-full text-xs md:text-sm font-medium shadow-[0_10px_40px_-10px_rgba(244,63,94,0.5)] flex items-center gap-3 transition-all duration-500 transform -translate-y-24 opacity-0 pointer-events-none backdrop-blur-xl border border-rose-400/30">
+        <div id="offline-toast" style="top: max(1rem, env(safe-area-inset-top));" class="fixed left-1/2 -translate-x-1/2 z-50 bg-rose-500/90 text-white px-5 py-3 rounded-full text-xs md:text-sm font-medium shadow-[0_10px_40px_-10px_rgba(244,63,94,0.5)] flex items-center gap-3 transition-all duration-500 transform -translate-y-24 opacity-0 pointer-events-none backdrop-blur-md border border-rose-400/30">
             <i data-lucide="wifi-off" class="w-4 h-4 md:w-5 md:h-5"></i>
             <span>Koneksi terputus. Mode offline aktif.</span>
         </div>
         
-        <div id="progress-toast" style="top: max(1rem, env(safe-area-inset-top));" class="fixed left-1/2 -translate-x-1/2 z-50 bg-indigo-500/90 text-white px-5 py-3 rounded-full text-xs md:text-sm font-medium shadow-[0_10px_40px_-10px_rgba(99,102,241,0.5)] flex items-center gap-3 transition-all duration-500 transform -translate-y-24 opacity-0 pointer-events-none backdrop-blur-xl border border-indigo-400/30">
+        <div id="progress-toast" style="top: max(1rem, env(safe-area-inset-top));" class="fixed left-1/2 -translate-x-1/2 z-50 bg-indigo-500/90 text-white px-5 py-3 rounded-full text-xs md:text-sm font-medium shadow-[0_10px_40px_-10px_rgba(99,102,241,0.5)] flex items-center gap-3 transition-all duration-500 transform -translate-y-24 opacity-0 pointer-events-none backdrop-blur-md border border-indigo-400/30">
             <i data-lucide="info" class="w-4 h-4 md:w-5 md:h-5"></i>
             <span>Status modul diperbarui!</span>
         </div>
 
-        <div id="storage-error-toast" style="top: max(1rem, env(safe-area-inset-top));" class="fixed left-1/2 -translate-x-1/2 z-50 bg-rose-500/90 text-white px-5 py-3 rounded-full text-xs md:text-sm font-medium shadow-[0_10px_40px_-10px_rgba(244,63,94,0.5)] flex items-center gap-3 transition-all duration-500 transform -translate-y-24 opacity-0 pointer-events-none backdrop-blur-xl border border-rose-400/30">
+        <div id="storage-error-toast" style="top: max(1rem, env(safe-area-inset-top));" class="fixed left-1/2 -translate-x-1/2 z-50 bg-rose-500/90 text-white px-5 py-3 rounded-full text-xs md:text-sm font-medium shadow-[0_10px_40px_-10px_rgba(244,63,94,0.5)] flex items-center gap-3 transition-all duration-500 transform -translate-y-24 opacity-0 pointer-events-none backdrop-blur-md border border-rose-400/30">
             <i data-lucide="hard-drive" class="w-4 h-4 md:w-5 md:h-5"></i>
             <span>Gagal menyimpan: Memori penuh atau diblokir.</span>
         </div>
@@ -290,9 +264,9 @@
 
         <main class="flex-1 flex flex-col h-full relative overflow-hidden bg-transparent w-full z-10">
             
-            <header id="main-header" style="padding-top: max(0.75rem, env(safe-area-inset-top)); padding-bottom: 0.75rem;" class="flex items-center justify-between px-5 md:px-8 min-h-[4.5rem] border-b border-borderGray bg-amoled/60 backdrop-blur-2xl sticky top-0 z-40 gap-4 transition-all duration-300">
+            <header id="main-header" style="padding-top: max(0.75rem, env(safe-area-inset-top)); padding-bottom: 0.75rem;" class="flex items-center justify-between px-5 md:px-8 min-h-[4.5rem] border-b border-borderGray bg-amoled/80 backdrop-blur-md sticky top-0 z-40 gap-4 transition-all duration-300">
                 <div id="logo-wrapper" onclick="resetAndScrollTop()" class="flex items-center gap-3 shrink-0 cursor-pointer group">
-                    <div class="w-8 h-8 rounded-[10px] bg-gradient-to-br from-zinc-800 to-zinc-950 border border-white/10 flex items-center justify-center shadow-[0_0_20px_rgba(99,102,241,0.15)] group-hover:border-indigo-500/40 group-hover:shadow-[0_0_20px_rgba(99,102,241,0.3)] transition-all duration-300">
+                    <div class="w-8 h-8 rounded-[10px] bg-gradient-to-br from-zinc-800 to-zinc-950 border border-white/10 flex items-center justify-center shadow-[0_0_20px_rgba(99,102,241,0.15)] group-hover:border-indigo-500/40 transition-all duration-300">
                         <i data-lucide="code-2" class="w-4 h-4 text-indigo-400"></i>
                     </div>
                     <h1 class="text-lg font-semibold text-white tracking-tight hidden sm:flex items-center gap-0.5">
@@ -301,7 +275,7 @@
                 </div>
                 
                 <div class="flex-1 flex justify-end md:justify-center relative">
-                    <div id="search-container" class="flex items-center bg-white/[0.03] border border-borderGray rounded-full px-4 py-2 w-full max-w-[44px] md:max-w-md hover:bg-white/[0.05] focus-within:bg-white/[0.05] focus-within:border-indigo-500/50 focus-within:ring-4 focus-within:ring-indigo-500/10 transition-all duration-300 group overflow-hidden cursor-text backdrop-blur-md shadow-inner">
+                    <div id="search-container" class="flex items-center bg-white/[0.03] border border-borderGray rounded-full px-4 py-2 w-full max-w-[44px] md:max-w-md hover:bg-white/[0.05] focus-within:bg-white/[0.05] focus-within:border-indigo-500/50 focus-within:ring-2 focus-within:ring-indigo-500/20 transition-all duration-300 group overflow-hidden cursor-text shadow-inner">
                         <i data-lucide="search" class="w-4 h-4 text-zinc-400 group-focus-within:text-indigo-400 transition-colors shrink-0" onclick="document.getElementById('search-input').focus()"></i>
                         <input id="search-input" aria-label="Cari Materi" type="search" placeholder="Cari materi HTML, Java..." class="bg-transparent border-none outline-none text-sm text-zinc-100 ml-3 w-full placeholder-zinc-500 opacity-0 md:opacity-100 group-focus-within:opacity-100 transition-opacity duration-300">
                         
@@ -332,8 +306,8 @@
                             <div class="absolute inset-0 bg-gradient-to-r from-emerald-500/5 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-duration-500 pointer-events-none"></div>
 
                             <div class="flex items-start md:items-center gap-5 md:gap-6 pointer-events-none relative z-10">
-                                <div id="hero-icon-wrap" class="min-w-[4rem] w-16 h-16 rounded-[1.2rem] bg-emerald-500/10 border border-emerald-500/20 flex items-center justify-center text-emerald-400 group-hover:scale-110 group-hover:rotate-3 transition-transform duration-500 shadow-[0_0_30px_rgba(16,185,129,0.1)]">
-                                    <i id="hero-icon" data-lucide="briefcase" class="w-8 h-8"></i>
+                                <div id="hero-icon-wrap" class="min-w-[4rem] w-16 h-16 rounded-[1.2rem] bg-emerald-500/10 border border-emerald-500/20 flex items-center justify-center text-emerald-400 transition-transform duration-300 shrink-0">
+                                    <i id="hero-icon" data-lucide="briefcase" class="w-8 h-8 shrink-0"></i>
                                 </div>
                                 <div>
                                     <p id="hero-subtitle" class="text-xs font-semibold text-emerald-400/90 uppercase tracking-widest mb-1.5">Lanjutkan Belajar</p>
@@ -348,7 +322,7 @@
                                     <span id="hero-status-text" class="text-amber-400 font-bold">Belum Selesai</span>
                                 </div>
                                 
-                                <div class="w-full bg-white text-black hover:bg-zinc-200 flex items-center justify-center gap-2 font-semibold text-sm py-3 px-4 rounded-xl transition-all shadow-[0_0_20px_rgba(255,255,255,0.15)] active:scale-95 pointer-events-none">
+                                <div class="w-full bg-white text-black hover:bg-zinc-200 flex items-center justify-center gap-2 font-semibold text-sm py-3 px-4 rounded-xl transition-all active:scale-95 pointer-events-none">
                                     <i data-lucide="book-open" class="w-4 h-4 btn-text"></i>
                                     <span class="btn-text">Buka Modul</span>
                                     <i data-lucide="loader-2" class="w-4 h-4 animate-spin hidden btn-spinner text-black"></i>
@@ -369,7 +343,7 @@
                         <h3 class="text-2xl font-bold text-white tracking-tight mb-3">Modul Tidak Ditemukan</h3>
                         <p class="text-zinc-400 text-base max-w-md mx-auto mb-8 leading-relaxed">Kami tidak dapat menemukan materi yang cocok dengan kata kunci <br/><span class="text-indigo-400 font-medium whitespace-nowrap">"<span id="keyword-display"></span>"</span>.</p>
                         
-                        <button id="btn-reset-search" class="px-6 py-3 bg-white/5 text-white text-sm font-medium rounded-xl border border-white/10 hover:bg-white/10 active:scale-95 transition-all focus:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500 mb-4 backdrop-blur-md shadow-lg">
+                        <button id="btn-reset-search" class="px-6 py-3 bg-white/5 text-white text-sm font-medium rounded-xl border border-white/10 hover:bg-white/10 active:scale-95 transition-all focus:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500 mb-4 shadow-sm">
                             Kembali ke Semua Modul
                         </button>
 
@@ -391,11 +365,11 @@
             </div>
         </main>
 
-        <div id="panel-backdrop" onclick="closeModulePanel()" class="fixed inset-0 bg-black/60 backdrop-blur-sm z-[60] opacity-0 pointer-events-none transition-opacity duration-500 ease-out"></div>
-        <div id="module-panel" aria-modal="true" role="dialog" class="fixed inset-y-0 right-0 w-full sm:w-[440px] md:w-[480px] bg-surface/95 backdrop-blur-3xl z-[70] transform translate-x-full transition-transform duration-500 cubic-bezier(0.16, 1, 0.3, 1) shadow-2xl flex flex-col border-l border-white/5 outline-none" tabindex="-1">
+        <div id="panel-backdrop" onclick="closeModulePanel()" class="fixed inset-0 bg-black/60 backdrop-blur-sm z-[60] opacity-0 pointer-events-none transition-opacity duration-300 ease-out"></div>
+        <div id="module-panel" aria-modal="true" role="dialog" class="fixed inset-y-0 right-0 w-full sm:w-[440px] md:w-[480px] bg-surface/95 backdrop-blur-xl z-[70] transform translate-x-full transition-transform duration-300 shadow-2xl flex flex-col border-l border-white/5 outline-none" tabindex="-1">
             <div class="w-12 h-1.5 bg-white/20 rounded-full mx-auto mt-4 sm:hidden absolute top-0 left-1/2 -translate-x-1/2"></div>
             
-            <div style="padding-top: max(1.5rem, env(safe-area-inset-top));" class="flex items-center justify-between p-5 md:p-8 border-b border-borderGray">
+            <div style="padding-top: max(1.5rem, env(safe-area-inset-top));" class="flex items-center justify-between p-5 md:p-8 border-b border-borderGray shrink-0">
                 <h3 class="text-lg font-semibold text-white tracking-tight flex items-center gap-2.5">
                     <i data-lucide="book-open" class="w-5 h-5 text-indigo-400"></i>
                     Detail Modul
@@ -405,16 +379,16 @@
                 </button>
             </div>
             <div style="padding-bottom: max(2rem, env(safe-area-inset-bottom));" class="flex-1 overflow-y-auto p-6 md:p-10 flex flex-col items-center justify-center text-center">
-                <div id="panel-icon-wrap" class="w-28 h-28 rounded-[2rem] flex items-center justify-center mb-8 shadow-2xl border relative overflow-hidden">
+                <div id="panel-icon-wrap" class="w-28 h-28 shrink-0 rounded-[2rem] flex items-center justify-center mb-8 border relative overflow-hidden">
                     <div class="absolute inset-0 bg-gradient-to-b from-white/10 to-transparent"></div>
-                    <i id="panel-icon" data-lucide="book" class="w-12 h-12 relative z-10"></i>
+                    <i id="panel-icon" data-lucide="book" class="w-12 h-12 relative z-10 shrink-0"></i>
                 </div>
                 
                 <h4 id="panel-title" class="text-2xl md:text-3xl font-bold text-white tracking-tight mb-4 leading-tight">Judul Modul</h4>
                 <p id="panel-desc" class="text-zinc-400 text-base mb-10 leading-relaxed max-w-sm">Deskripsi modul akan muncul di sini.</p>
                 
-                <div class="w-full max-w-sm space-y-3">
-                    <button id="btn-read-module" onclick="closeModulePanel()" class="w-full py-3.5 bg-white text-black font-semibold rounded-2xl transition-all shadow-[0_0_20px_rgba(255,255,255,0.15)] hover:bg-zinc-200 active:scale-[0.98] flex items-center justify-center gap-2 focus:outline-none focus-visible:ring-2 focus-visible:ring-white">
+                <div class="w-full max-w-sm space-y-3 shrink-0">
+                    <button id="btn-read-module" onclick="closeModulePanel()" class="w-full py-3.5 bg-white text-black font-semibold rounded-2xl transition-all hover:bg-zinc-200 active:scale-[0.98] flex items-center justify-center gap-2 focus:outline-none focus-visible:ring-2 focus-visible:ring-white">
                         <span>Baca Modul</span>
                         <i data-lucide="book-open" class="w-4 h-4"></i>
                     </button>
@@ -431,36 +405,36 @@
         </div>
 
         <div id="bottom-nav-wrapper" class="nav-wrapper-mask shadow-[0_30px_60px_-15px_rgba(0,0,0,1)] rounded-full">
-            <nav id="bottom-nav" class="nav-scroll-grab flex bg-[#161618]/80 backdrop-blur-3xl border border-white/10 rounded-full px-2 py-2 sm:px-3 sm:py-2.5 items-center gap-1 sm:gap-2 transition-all duration-500 w-max max-w-full overflow-x-auto no-scrollbar snap-x snap-mandatory relative z-20 shadow-inner">
+            <nav id="bottom-nav" class="nav-scroll-grab flex bg-[#161618]/90 backdrop-blur-md border border-white/10 rounded-full px-2 py-2 sm:px-3 sm:py-2.5 items-center gap-1 sm:gap-2 transition-all duration-300 w-max max-w-full overflow-x-auto no-scrollbar snap-x snap-mandatory relative z-20 shadow-inner">
                 
                 <a href="index.html" aria-label="Menu Beranda" draggable="false" class="main-nav-item text-white snap-center w-12 h-12 sm:w-14 sm:h-14 rounded-[1.25rem] flex items-center justify-center hover:bg-white/5 active:scale-95 transition-all duration-300 group relative shrink-0 focus:outline-none focus-visible:ring-2 focus-visible:ring-white/20 select-none">
-                    <i data-lucide="layout-dashboard" class="w-5 h-5 sm:w-6 sm:h-6 text-indigo-400 group-hover:-translate-y-0.5 transition-all duration-300 relative z-10 pointer-events-none"></i>
+                    <i data-lucide="layout-dashboard" class="w-5 h-5 sm:w-6 sm:h-6 text-indigo-400 transition-transform duration-300 relative z-10 pointer-events-none"></i>
                     <div class="active-indicator absolute inset-0 rounded-[1.25rem] bg-white/10 transition-opacity duration-300 pointer-events-none"></div>
-                    <div class="active-dot absolute bottom-1.5 w-1 h-1 rounded-full bg-white transition-all duration-300 shadow-[0_0_8px_rgba(255,255,255,0.8)] pointer-events-none"></div>
+                    <div class="active-dot absolute bottom-1.5 w-1 h-1 rounded-full bg-white transition-all duration-300 pointer-events-none"></div>
                     <span class="floating-tooltip hidden md:block">Beranda</span>
                 </a>
 
                 <div class="snap-center w-px h-6 sm:h-8 bg-white/10 mx-1.5 shrink-0 rounded-full"></div>
 
                 <a href="#kelas-10" aria-label="Scroll ke Kelas 10" draggable="false" class="nav-fase-link snap-center nav-item w-12 h-12 sm:w-14 sm:h-14 rounded-[1.25rem] flex items-center justify-center hover:bg-white/5 active:scale-95 transition-all duration-300 group relative shrink-0 focus:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500 select-none">
-                    <div class="nav-dot w-2.5 h-2.5 sm:w-3 sm:h-3 rounded-full bg-emerald-500 shadow-[0_0_12px_rgba(16,185,129,0.6)] group-hover:scale-125 transition-all duration-300 pointer-events-none"></div>
+                    <span class="nav-text text-base sm:text-lg font-bold text-zinc-500 group-hover:scale-110 transition-all duration-300 pointer-events-none">10</span>
                     <span class="floating-tooltip hidden md:block">Kelas 10</span>
                 </a>
                 
                 <a href="#kelas-11" aria-label="Scroll ke Kelas 11" draggable="false" class="nav-fase-link snap-center nav-item w-12 h-12 sm:w-14 sm:h-14 rounded-[1.25rem] flex items-center justify-center hover:bg-white/5 active:scale-95 transition-all duration-300 group relative shrink-0 focus:outline-none focus-visible:ring-2 focus-visible:ring-amber-500 select-none">
-                    <div class="nav-dot w-2.5 h-2.5 sm:w-3 sm:h-3 rounded-full bg-amber-500 shadow-[0_0_12px_rgba(245,158,11,0.6)] group-hover:scale-125 transition-all duration-300 pointer-events-none"></div>
+                    <span class="nav-text text-base sm:text-lg font-bold text-zinc-500 group-hover:scale-110 transition-all duration-300 pointer-events-none">11</span>
                     <span class="floating-tooltip hidden md:block">Kelas 11</span>
                 </a>
                 
                 <a href="#kelas-12" aria-label="Scroll ke Kelas 12" draggable="false" class="nav-fase-link snap-center nav-item w-12 h-12 sm:w-14 sm:h-14 rounded-[1.25rem] flex items-center justify-center hover:bg-white/5 active:scale-95 transition-all duration-300 group relative shrink-0 focus:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500 select-none">
-                    <div class="nav-dot w-2.5 h-2.5 sm:w-3 sm:h-3 rounded-full bg-indigo-500 shadow-[0_0_12px_rgba(99,102,241,0.6)] group-hover:scale-125 transition-all duration-300 pointer-events-none"></div>
+                    <span class="nav-text text-base sm:text-lg font-bold text-zinc-500 group-hover:scale-110 transition-all duration-300 pointer-events-none">12</span>
                     <span class="floating-tooltip hidden md:block">Kelas 12</span>
                 </a>
 
                 <div class="snap-center w-px h-6 sm:h-8 bg-white/10 mx-1.5 shrink-0 rounded-full"></div>
 
                 <a href="profil.html" aria-label="Profil Pengguna dan Pengaturan" draggable="false" class="snap-center main-nav-item nav-item w-12 h-12 sm:w-14 sm:h-14 rounded-[1.25rem] flex items-center justify-center hover:bg-white/5 active:scale-95 transition-all duration-300 group relative shrink-0 focus:outline-none focus-visible:ring-2 focus-visible:ring-white/20 select-none">
-                    <img id="nav-user-avatar" src="https://api.dicebear.com/7.x/avataaars/svg?seed=Felix&backgroundColor=121214" onerror="this.onerror=null; this.src=window.DEFAULT_AVATAR;" alt="User" draggable="false" class="w-8 h-8 sm:w-9 sm:h-9 object-cover rounded-full bg-surface border border-white/20 group-hover:border-white/50 group-hover:scale-105 transition-all duration-300 pointer-events-none shadow-lg">
+                    <img id="nav-user-avatar" src="https://api.dicebear.com/7.x/avataaars/svg?seed=Felix&backgroundColor=121214" onerror="this.onerror=null; this.src=window.DEFAULT_AVATAR;" alt="User" draggable="false" class="w-8 h-8 sm:w-9 sm:h-9 shrink-0 object-cover rounded-full bg-surface border border-white/20 transition-all duration-300 pointer-events-none">
                     <span class="floating-tooltip hidden md:block">Profil & Pengaturan</span>
                 </a>
             </nav>
@@ -707,7 +681,7 @@
                     { id: 'm23', title: 'Pengembangan Gim Dasar', desc: 'Konsep game engine, manipulasi asset 2D/3D, implementasi fisika, dan scripting game (Unity/Godot).', icon: 'gamepad-2', color: 'violet', isCompleted: false },
                     { id: 'm24', title: 'Cloud Computing & Deployment', desc: 'Manajemen Virtual Private Server (VPS), dasar Docker container, dan merilis aplikasi ke publik (Hosting).', icon: 'cloud-upload', color: 'blue', isCompleted: false },
                     { id: 'm25', title: 'Keamanan Sistem Dasar', desc: 'Pengenalan metode enkripsi, sistem autentikasi (JWT), dan pencegahan kerentanan aplikasi (OWASP).', icon: 'lock', color: 'amber', isCompleted: false },
-                    { id: 'm26', title: 'Internet of Things (IoT) Dasar', desc: 'Pemahaman komunikasi perangkat keras dengan aplikasi perangkatgetLocal lunak dan protokol dasar HTTP/MQTT.', icon: 'wifi', color: 'sky', isCompleted: false },
+                    { id: 'm26', title: 'Internet of Things (IoT) Dasar', desc: 'Pemahaman komunikasi perangkat keras dengan aplikasi perangkat lunak dan protokol dasar HTTP/MQTT.', icon: 'wifi', color: 'sky', isCompleted: false },
                     { id: 'm27', title: 'Proyek Akhir (Capstone)', desc: 'Pengerjaan proyek riil berbasis tim secara terstruktur menggunakan metodologi Agile/Scrum layaknya industri.', icon: 'rocket', color: 'emerald', isCompleted: false },
                     { id: 'm28', title: 'Persiapan Uji Kompetensi Keahlian', desc: 'Simulasi dan pemantapan materi persiapan menghadapi UKK PPLG sesuai standar industri & LSP.', icon: 'graduation-cap', color: 'indigo', isCompleted: false },
                     { id: 'm29', title: 'Legalitas & Pemasaran Produk', desc: 'Memahami pendaftaran Hak Kekayaan Intelektual (HAKI) dan strategi pemasaran digital untuk aplikasi.', icon: 'megaphone', color: 'orange', isCompleted: false },
@@ -792,11 +766,10 @@
                 statusText.className = "text-emerald-400 font-bold";
             }
 
-            iconWrap.className = `min-w-[4rem] w-16 h-16 rounded-[1.2rem] ${colors.bg} ${colors.border} border flex items-center justify-center ${colors.text} group-hover:scale-110 group-hover:rotate-3 transition-transform duration-500 shadow-[0_0_30px_rgba(255,255,255,0.05)] focus:outline-none`;
-            iconWrap.style.boxShadow = `0 0 30px var(--tw-shadow-color)`;
+            iconWrap.className = `min-w-[4rem] shrink-0 w-16 h-16 rounded-[1.2rem] ${colors.bg} ${colors.border} border flex items-center justify-center ${colors.text} transition-transform duration-300 shadow-sm focus:outline-none`;
             icon.setAttribute('data-lucide', targetModule.icon);
 
-            card.className = `relative bg-surface border border-borderGray rounded-[2rem] p-6 md:p-8 flex flex-col md:flex-row md:items-center justify-between gap-6 hover:shadow-card-hover group cursor-pointer transition-all focus:outline-none focus-visible:ring-4 focus-visible:ring-${colors.bar.replace('bg-','')}/50 overflow-hidden`;
+            card.className = `relative bg-surface border border-borderGray rounded-[2rem] p-6 md:p-8 flex flex-col md:flex-row md:items-center justify-between gap-6 group cursor-pointer transition-all focus:outline-none focus-visible:ring-4 focus-visible:ring-${colors.bar.replace('bg-','')}/50 overflow-hidden`;
             card.onclick = (e) => simulateLoading(card, e, targetModule);
             
             if (window.lucide) {
@@ -888,8 +861,8 @@
             const iconWrap = document.getElementById('panel-icon-wrap');
             const colors = colorMap[moduleData.color] || colorMap['indigo'];
             
-            iconWrap.className = `w-28 h-28 rounded-[2rem] flex items-center justify-center mb-8 shadow-[0_0_40px_rgba(255,255,255,0.05)] border relative overflow-hidden ${colors.bg} ${colors.border} ${colors.text}`;
-            iconWrap.innerHTML = `<div class="absolute inset-0 bg-gradient-to-b from-white/10 to-transparent pointer-events-none"></div><i id="panel-icon" data-lucide="${moduleData.icon}" class="w-12 h-12 relative z-10"></i>`;
+            iconWrap.className = `w-28 h-28 shrink-0 rounded-[2rem] flex items-center justify-center mb-8 border relative overflow-hidden ${colors.bg} ${colors.border} ${colors.text}`;
+            iconWrap.innerHTML = `<div class="absolute inset-0 bg-gradient-to-b from-white/10 to-transparent pointer-events-none"></div><i id="panel-icon" data-lucide="${moduleData.icon}" class="w-12 h-12 relative z-10 shrink-0"></i>`;
             
             const btnToggleText = document.getElementById('btn-toggle-text');
             const btnToggleIcon = document.getElementById('btn-toggle-icon');
@@ -973,7 +946,6 @@
             }
         }
 
-        // SISTEM BENTO GRID / MOSAIC BARU (Disempurnakan) ===========================
         function updateModuleCardDOM(mod) {
             const card = document.getElementById(`mod-card-${mod.id}`);
             if (!card) return;
@@ -984,7 +956,6 @@
 
             card.onclick = (e) => simulateLoading(card, e, mod);
 
-            // Update Badge dengan aman menggunakan wrapper
             const badgeWrappers = card.querySelectorAll('.badge-wrapper');
             badgeWrappers.forEach(wrapper => {
                 wrapper.innerHTML = isCompleted ? `<span class="badge-selesai px-2.5 py-1 text-[10px] font-bold uppercase tracking-widest bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 rounded-lg backdrop-blur-sm shrink-0 whitespace-nowrap shadow-sm">Selesai</span>` : '';
@@ -996,22 +967,21 @@
                 card.classList.remove('opacity-75', 'hover:opacity-100');
             }
 
-            // Ganti tombol bawah tanpa Progress Bar
             let bottomHtml = '';
             if (isCompleted) {
                 bottomHtml = `
-                    <div role="button" tabindex="0" class="w-full py-2.5 bg-emerald-500/10 hover:bg-emerald-500/20 flex items-center justify-center gap-2 text-emerald-400 text-sm font-semibold rounded-xl transition-all border border-emerald-500/20 active:scale-95 pointer-events-auto cursor-pointer backdrop-blur-sm">
-                        <i data-lucide="check-circle" class="w-4 h-4 btn-text"></i>
+                    <div role="button" tabindex="0" class="w-full py-2.5 bg-emerald-500/10 hover:bg-emerald-500/20 flex items-center justify-center gap-2 text-emerald-400 text-sm font-semibold rounded-xl transition-all border border-emerald-500/20 active:scale-95 pointer-events-auto cursor-pointer">
+                        <i data-lucide="check-circle" class="w-4 h-4 btn-text shrink-0"></i>
                         <span class="btn-text">Diulas</span>
-                        <i data-lucide="loader-2" class="w-4 h-4 animate-spin hidden btn-spinner text-emerald-400"></i>
+                        <i data-lucide="loader-2" class="w-4 h-4 animate-spin hidden btn-spinner text-emerald-400 shrink-0"></i>
                     </div>
                 `;
             } else {
                 bottomHtml = `
-                    <div role="button" tabindex="0" class="w-full py-2.5 bg-white/5 hover:bg-white/10 flex items-center justify-center gap-2 text-white text-sm font-medium rounded-xl transition-all border border-white/5 active:scale-95 pointer-events-auto cursor-pointer backdrop-blur-sm">
-                        <i data-lucide="book-open" class="w-4 h-4 btn-text"></i>
+                    <div role="button" tabindex="0" class="w-full py-2.5 bg-white/5 hover:bg-white/10 flex items-center justify-center gap-2 text-white text-sm font-medium rounded-xl transition-all border border-white/5 active:scale-95 pointer-events-auto cursor-pointer">
+                        <i data-lucide="book-open" class="w-4 h-4 btn-text shrink-0"></i>
                         <span class="btn-text">Buka</span>
-                        <i data-lucide="loader-2" class="w-4 h-4 animate-spin hidden btn-spinner text-white"></i>
+                        <i data-lucide="loader-2" class="w-4 h-4 animate-spin hidden btn-spinner text-white shrink-0"></i>
                     </div>
                 `;
             }
@@ -1073,49 +1043,49 @@
                 <section class="pt-2 pb-8 animate-fade-in">
                     <div class="mb-8">
                         <div class="flex items-center gap-3 mb-2">
-                            <div class="h-8 md:h-10 w-32 bg-white/5 rounded-xl skeleton-shimmer"></div>
-                            <div class="h-6 w-24 bg-white/5 rounded-lg skeleton-shimmer"></div>
+                            <div class="h-8 md:h-10 w-32 bg-white/5 rounded-xl animate-pulse"></div>
+                            <div class="h-6 w-24 bg-white/5 rounded-lg animate-pulse"></div>
                         </div>
-                        <div class="h-4 w-64 bg-white/5 rounded-md flex skeleton-shimmer"></div>
+                        <div class="h-4 w-64 bg-white/5 rounded-md flex animate-pulse"></div>
                     </div>
                     <div class="grid grid-cols-12 gap-4 md:gap-5">
                         <!-- Horizontal Skeleton -->
-                        <div class="col-span-12 md:col-span-8 bg-surface border border-white/5 rounded-[1.5rem] p-6 flex flex-col md:flex-row gap-6 relative overflow-hidden">
-                             <div class="w-14 h-14 rounded-[1.2rem] bg-white/5 skeleton-shimmer shrink-0"></div>
+                        <div class="col-span-12 md:col-span-8 bg-surface border border-white/5 rounded-[1.5rem] p-6 flex flex-col md:flex-row gap-6 relative overflow-hidden animate-pulse">
+                             <div class="w-14 h-14 rounded-[1.2rem] bg-white/5 shrink-0"></div>
                              <div class="flex-1 space-y-3 justify-center flex flex-col">
-                                 <div class="h-6 w-3/4 bg-white/10 rounded-lg skeleton-shimmer"></div>
-                                 <div class="h-4 w-full bg-white/5 rounded-md skeleton-shimmer"></div>
-                                 <div class="h-4 w-2/3 bg-white/5 rounded-md skeleton-shimmer"></div>
+                                 <div class="h-6 w-3/4 bg-white/10 rounded-lg"></div>
+                                 <div class="h-4 w-full bg-white/5 rounded-md"></div>
+                                 <div class="h-4 w-2/3 bg-white/5 rounded-md"></div>
                              </div>
                              <div class="shrink-0 w-full md:w-48 lg:w-56 flex flex-col justify-center border-t md:border-t-0 md:border-l border-white/5 pt-4 md:pt-0 pl-0 md:pl-6 mt-4 md:mt-0">
-                                 <div class="h-10 w-full bg-white/5 rounded-xl skeleton-shimmer"></div>
+                                 <div class="h-10 w-full bg-white/5 rounded-xl"></div>
                              </div>
                         </div>
                         <!-- Vertical Skeleton -->
-                        <div class="col-span-12 md:col-span-4 bg-surface border border-white/5 rounded-[1.5rem] p-6 flex flex-col relative overflow-hidden">
-                             <div class="w-12 h-12 rounded-[1.1rem] bg-white/5 skeleton-shimmer mb-4"></div>
-                             <div class="h-5 w-3/4 bg-white/10 rounded-lg skeleton-shimmer mb-3"></div>
-                             <div class="h-3 w-full bg-white/5 rounded-md skeleton-shimmer mb-4"></div>
+                        <div class="col-span-12 md:col-span-4 bg-surface border border-white/5 rounded-[1.5rem] p-6 flex flex-col relative overflow-hidden animate-pulse">
+                             <div class="w-12 h-12 rounded-[1.1rem] bg-white/5 mb-4 shrink-0"></div>
+                             <div class="h-5 w-3/4 bg-white/10 rounded-lg mb-3"></div>
+                             <div class="h-3 w-full bg-white/5 rounded-md mb-4"></div>
                              <div class="mt-auto pt-4 border-t border-white/5 shrink-0 w-full">
-                                 <div class="h-10 w-full bg-white/5 rounded-xl skeleton-shimmer"></div>
+                                 <div class="h-10 w-full bg-white/5 rounded-xl"></div>
                              </div>
                         </div>
                         <!-- Vertical Skeleton -->
-                        <div class="col-span-12 md:col-span-4 bg-surface border border-white/5 rounded-[1.5rem] p-6 flex flex-col relative overflow-hidden hidden md:flex">
-                             <div class="w-12 h-12 rounded-[1.1rem] bg-white/5 skeleton-shimmer mb-4"></div>
-                             <div class="h-5 w-3/4 bg-white/10 rounded-lg skeleton-shimmer mb-3"></div>
-                             <div class="h-3 w-full bg-white/5 rounded-md skeleton-shimmer mb-4"></div>
+                        <div class="col-span-12 md:col-span-4 bg-surface border border-white/5 rounded-[1.5rem] p-6 flex flex-col relative overflow-hidden hidden md:flex animate-pulse">
+                             <div class="w-12 h-12 rounded-[1.1rem] bg-white/5 mb-4 shrink-0"></div>
+                             <div class="h-5 w-3/4 bg-white/10 rounded-lg mb-3"></div>
+                             <div class="h-3 w-full bg-white/5 rounded-md mb-4"></div>
                              <div class="mt-auto pt-4 border-t border-white/5 shrink-0 w-full">
-                                 <div class="h-10 w-full bg-white/5 rounded-xl skeleton-shimmer"></div>
+                                 <div class="h-10 w-full bg-white/5 rounded-xl"></div>
                              </div>
                         </div>
                          <!-- Vertical Skeleton -->
-                        <div class="col-span-12 md:col-span-4 bg-surface border border-white/5 rounded-[1.5rem] p-6 flex flex-col relative overflow-hidden hidden lg:flex">
-                             <div class="w-12 h-12 rounded-[1.1rem] bg-white/5 skeleton-shimmer mb-4"></div>
-                             <div class="h-5 w-3/4 bg-white/10 rounded-lg skeleton-shimmer mb-3"></div>
-                             <div class="h-3 w-full bg-white/5 rounded-md skeleton-shimmer mb-4"></div>
+                        <div class="col-span-12 md:col-span-4 bg-surface border border-white/5 rounded-[1.5rem] p-6 flex flex-col relative overflow-hidden hidden lg:flex animate-pulse">
+                             <div class="w-12 h-12 rounded-[1.1rem] bg-white/5 mb-4 shrink-0"></div>
+                             <div class="h-5 w-3/4 bg-white/10 rounded-lg mb-3"></div>
+                             <div class="h-3 w-full bg-white/5 rounded-md mb-4"></div>
                              <div class="mt-auto pt-4 border-t border-white/5 shrink-0 w-full">
-                                 <div class="h-10 w-full bg-white/5 rounded-xl skeleton-shimmer"></div>
+                                 <div class="h-10 w-full bg-white/5 rounded-xl"></div>
                              </div>
                         </div>
                     </div>
@@ -1130,18 +1100,18 @@
             let bottomSectionHtml = '';
             if (isCompleted) {
                 bottomSectionHtml = `
-                    <div role="button" tabindex="0" class="w-full py-2.5 bg-emerald-500/10 hover:bg-emerald-500/20 flex items-center justify-center gap-2 text-emerald-400 text-sm font-semibold rounded-xl transition-all border border-emerald-500/20 active:scale-95 pointer-events-auto cursor-pointer backdrop-blur-sm">
-                        <i data-lucide="check-circle" class="w-4 h-4 btn-text"></i>
+                    <div role="button" tabindex="0" class="w-full py-2.5 bg-emerald-500/10 hover:bg-emerald-500/20 flex items-center justify-center gap-2 text-emerald-400 text-sm font-semibold rounded-xl transition-all border border-emerald-500/20 active:scale-95 pointer-events-auto cursor-pointer">
+                        <i data-lucide="check-circle" class="w-4 h-4 btn-text shrink-0"></i>
                         <span class="btn-text">Diulas</span>
-                        <i data-lucide="loader-2" class="w-4 h-4 animate-spin hidden btn-spinner text-emerald-400"></i>
+                        <i data-lucide="loader-2" class="w-4 h-4 animate-spin hidden btn-spinner text-emerald-400 shrink-0"></i>
                     </div>
                 `;
             } else {
                 bottomSectionHtml = `
-                    <div role="button" tabindex="0" class="w-full py-2.5 bg-white/5 hover:bg-white/10 flex items-center justify-center gap-2 text-white text-sm font-medium rounded-xl transition-all border border-white/5 active:scale-95 pointer-events-auto cursor-pointer backdrop-blur-sm">
-                        <i data-lucide="book-open" class="w-4 h-4 btn-text"></i>
+                    <div role="button" tabindex="0" class="w-full py-2.5 bg-white/5 hover:bg-white/10 flex items-center justify-center gap-2 text-white text-sm font-medium rounded-xl transition-all border border-white/5 active:scale-95 pointer-events-auto cursor-pointer">
+                        <i data-lucide="book-open" class="w-4 h-4 btn-text shrink-0"></i>
                         <span class="btn-text">Buka</span>
-                        <i data-lucide="loader-2" class="w-4 h-4 animate-spin hidden btn-spinner text-white"></i>
+                        <i data-lucide="loader-2" class="w-4 h-4 animate-spin hidden btn-spinner text-white shrink-0"></i>
                     </div>
                 `;
             }
@@ -1149,16 +1119,15 @@
             const completedClass = isCompleted ? 'opacity-75 hover:opacity-100' : '';
             const badgeHtml = isCompleted ? `<span class="badge-selesai px-2.5 py-1 text-[10px] font-bold uppercase tracking-widest bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 rounded-lg backdrop-blur-sm shrink-0 whitespace-nowrap shadow-sm">Selesai</span>` : '';
 
-            // Algoritma Grid Pola Bento yang menghasilkan layout unik dan rapi!
             const pattern = [
-                { span: 'col-span-12 md:col-span-8 lg:col-span-8', layout: 'horizontal' }, // 0
-                { span: 'col-span-12 md:col-span-4 lg:col-span-4', layout: 'vertical' },   // 1
-                { span: 'col-span-12 md:col-span-4 lg:col-span-4', layout: 'vertical' },   // 2
-                { span: 'col-span-12 md:col-span-4 lg:col-span-4', layout: 'vertical' },   // 3
-                { span: 'col-span-12 md:col-span-4 lg:col-span-4', layout: 'vertical' },   // 4
-                { span: 'col-span-12 md:col-span-6 lg:col-span-6', layout: 'horizontal-sm' }, // 5
-                { span: 'col-span-12 md:col-span-6 lg:col-span-6', layout: 'horizontal-sm' }, // 6
-                { span: 'col-span-12', layout: 'horizontal-wide' } // 7
+                { span: 'col-span-12 md:col-span-8 lg:col-span-8', layout: 'horizontal' },
+                { span: 'col-span-12 md:col-span-4 lg:col-span-4', layout: 'vertical' },
+                { span: 'col-span-12 md:col-span-4 lg:col-span-4', layout: 'vertical' },
+                { span: 'col-span-12 md:col-span-4 lg:col-span-4', layout: 'vertical' },
+                { span: 'col-span-12 md:col-span-4 lg:col-span-4', layout: 'vertical' },
+                { span: 'col-span-12 md:col-span-6 lg:col-span-6', layout: 'horizontal-sm' },
+                { span: 'col-span-12 md:col-span-6 lg:col-span-6', layout: 'horizontal-sm' },
+                { span: 'col-span-12', layout: 'horizontal-wide' }
             ];
             
             const config = pattern[index % 8];
@@ -1166,19 +1135,17 @@
             let innerHtml = '';
 
             const baseCardWrapperStart = `
-                <div id="mod-card-${mod.id}" data-search-text="${mod.title.toLowerCase()} ${mod.desc.toLowerCase()}" tabindex="0" role="button" onkeydown="if(event.key==='Enter' || event.key===' ') { event.preventDefault(); this.click(); }" onclick="simulateLoading(this, event, ${JSON.stringify(mod).replace(/"/g, '&quot;')})" class="module-wrapper module-card bg-surface border border-borderGray hover:border-white/10 rounded-[1.5rem] p-5 md:p-6 flex flex-col cursor-pointer group relative overflow-hidden active:scale-[0.98] focus:outline-none focus-visible:ring-4 focus-visible:ring-${colors.bar.replace('bg-', '')}/50 transition-all duration-400 shadow-sm hover:shadow-xl hover:-translate-y-1 ${completedClass} ${spanClass}">
-                    <div class="absolute inset-0 bg-gradient-to-br from-${colors.bar.replace('bg-', '')}/[0.03] to-transparent opacity-100 group-hover:opacity-0 transition-opacity duration-500 pointer-events-none"></div>
-                    <div class="absolute -inset-32 bg-gradient-to-tr from-${colors.bar.replace('bg-', '')}/0 via-${colors.bar.replace('bg-', '')}/[0.08] to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none blur-2xl"></div>
+                <div id="mod-card-${mod.id}" data-search-text="${mod.title.toLowerCase()} ${mod.desc.toLowerCase()}" tabindex="0" role="button" onkeydown="if(event.key==='Enter' || event.key===' ') { event.preventDefault(); this.click(); }" onclick="simulateLoading(this, event, ${JSON.stringify(mod).replace(/"/g, '&quot;')})" class="module-wrapper module-card bg-surface border border-borderGray hover:border-white/10 rounded-[1.5rem] p-5 md:p-6 flex flex-col cursor-pointer group relative overflow-hidden active:scale-[0.98] focus:outline-none focus-visible:ring-4 focus-visible:ring-${colors.bar.replace('bg-', '')}/50 transition-all duration-300 shadow-sm hover:shadow-xl hover:-translate-y-1 ${completedClass} ${spanClass}">
+                    <div class="absolute inset-0 bg-gradient-to-br from-${colors.bar.replace('bg-', '')}/[0.03] to-transparent opacity-100 group-hover:opacity-0 transition-opacity duration-300 pointer-events-none"></div>
             `;
             const baseCardWrapperEnd = `</div>`;
 
-            // STRUKTUR FLEXBOX YANG DIROBAK: Memisahkan (Header+Teks) dengan Tombol secara ketat menggunakan mt-auto dan shrink-0.
             if (config.layout === 'vertical') {
                 innerHtml = `
                     <div class="relative z-10 flex flex-col w-full h-full">
                         <div class="mod-header-section flex justify-between items-start mb-4 shrink-0">
-                            <div class="w-12 h-12 rounded-[1.1rem] ${colors.bg} ${colors.border} border flex items-center justify-center ${colors.text} transition-all duration-500 group-hover:scale-110 group-hover:-rotate-3 shadow-md">
-                                <i data-lucide="${mod.icon}" class="w-6 h-6"></i>
+                            <div class="w-12 h-12 shrink-0 rounded-[1.1rem] ${colors.bg} ${colors.border} border flex items-center justify-center ${colors.text} transition-transform duration-300 shadow-sm">
+                                <i data-lucide="${mod.icon}" class="w-6 h-6 shrink-0"></i>
                             </div>
                             <div class="badge-wrapper">${badgeHtml}</div>
                         </div>
@@ -1196,10 +1163,9 @@
                     <div class="relative z-10 flex flex-col md:flex-row w-full h-full gap-5 md:gap-6">
                         <div class="flex-1 flex flex-col md:flex-row gap-4 md:gap-5 items-start md:items-center w-full">
                             <div class="mod-header-section flex justify-between items-center w-full md:w-auto shrink-0">
-                                <div class="w-14 h-14 rounded-[1.2rem] ${colors.bg} ${colors.border} border flex items-center justify-center ${colors.text} transition-all duration-500 group-hover:scale-110 group-hover:-rotate-3 shadow-lg">
-                                    <i data-lucide="${mod.icon}" class="w-7 h-7"></i>
+                                <div class="w-14 h-14 shrink-0 rounded-[1.2rem] ${colors.bg} ${colors.border} border flex items-center justify-center ${colors.text} transition-transform duration-300 shadow-sm">
+                                    <i data-lucide="${mod.icon}" class="w-7 h-7 shrink-0"></i>
                                 </div>
-                                <!-- Badge khusus Mobile jika tidak muat di judul -->
                                 <div class="badge-wrapper md:hidden">${badgeHtml}</div>
                             </div>
                             <div class="flex-1 min-w-0 w-full flex flex-col justify-center">
@@ -1220,8 +1186,8 @@
                     <div class="relative z-10 flex flex-col sm:flex-row w-full h-full gap-4 sm:gap-5">
                         <div class="flex-1 flex flex-col sm:flex-row gap-4 sm:gap-4 items-start sm:items-center w-full">
                             <div class="mod-header-section flex justify-between items-center w-full sm:w-auto shrink-0">
-                                <div class="w-12 h-12 rounded-[1.1rem] ${colors.bg} ${colors.border} border flex items-center justify-center ${colors.text} transition-all duration-500 group-hover:scale-110 group-hover:-rotate-3 shadow-md">
-                                    <i data-lucide="${mod.icon}" class="w-6 h-6"></i>
+                                <div class="w-12 h-12 shrink-0 rounded-[1.1rem] ${colors.bg} ${colors.border} border flex items-center justify-center ${colors.text} transition-transform duration-300 shadow-sm">
+                                    <i data-lucide="${mod.icon}" class="w-6 h-6 shrink-0"></i>
                                 </div>
                                 <div class="badge-wrapper sm:hidden">${badgeHtml}</div>
                             </div>
@@ -1243,8 +1209,8 @@
                     <div class="relative z-10 flex flex-col md:flex-row w-full h-full gap-4 md:gap-6">
                         <div class="flex-1 flex flex-col md:flex-row gap-4 md:gap-6 items-start md:items-center w-full">
                             <div class="mod-header-section flex justify-between items-center w-full md:w-auto shrink-0">
-                                <div class="w-12 h-12 md:w-14 md:h-14 rounded-[1.1rem] ${colors.bg} ${colors.border} border flex items-center justify-center ${colors.text} transition-all duration-500 group-hover:scale-110 group-hover:-rotate-3 shadow-lg">
-                                    <i data-lucide="${mod.icon}" class="w-6 h-6 md:w-7 md:h-7"></i>
+                                <div class="w-12 h-12 md:w-14 md:h-14 shrink-0 rounded-[1.1rem] ${colors.bg} ${colors.border} border flex items-center justify-center ${colors.text} transition-transform duration-300 shadow-sm">
+                                    <i data-lucide="${mod.icon}" class="w-6 h-6 md:w-7 md:h-7 shrink-0"></i>
                                 </div>
                                 <div class="badge-wrapper md:hidden">${badgeHtml}</div>
                             </div>
@@ -1277,7 +1243,6 @@
                 section.id = phase.phaseId;
                 section.className = `scroll-mt-32 phase-section ${index !== 0 ? 'pt-10 md:pt-14 border-t border-white/5 mt-10' : ''}`;
                 
-                // Meneruskan index loop (modIndex) agar Bento Grid tahu polanya!
                 const modulesHTML = phase.modules.map((mod, modIndex) => generateModuleCardHTML(mod, modIndex)).join('');
 
                 section.innerHTML = `
@@ -1288,7 +1253,6 @@
                         </h2>
                         <p class="text-zinc-400 text-sm md:text-base mt-2 leading-relaxed">${phase.description}</p>
                     </div>
-                    <!-- Penggunaan 12 Kolom CSS Grid yang Kuat dan Fleksibel -->
                     <div class="grid grid-cols-12 gap-4 md:gap-5 items-stretch phase-grid">
                         ${modulesHTML}
                     </div>
@@ -1381,7 +1345,7 @@
                 emptyState.classList.remove('hidden');
                 emptyState.classList.add('flex');
                 keywordDisplay.textContent = keyword;
-                curriculumContainer.classList.add('hidden'); // Menyembunyikan 300px min-height penampung agar empty-state meluncur ke atas
+                curriculumContainer.classList.add('hidden'); 
             } else {
                 emptyState.classList.add('hidden');
                 emptyState.classList.remove('flex');
@@ -1535,14 +1499,26 @@
                     if (entry.isIntersecting) {
                         const activeId = entry.target.id;
                         navLinks.forEach(link => {
-                            const dot = link.querySelector('.nav-dot');
+                            const textEl = link.querySelector('.nav-text');
                             const targetHref = link.getAttribute('href').substring(1);
+                            
+                            let activeColorClass = 'text-white';
+                            if (targetHref === 'kelas-10') activeColorClass = 'text-emerald-400';
+                            if (targetHref === 'kelas-11') activeColorClass = 'text-amber-400';
+                            if (targetHref === 'kelas-12') activeColorClass = 'text-indigo-400';
+
                             if (targetHref === activeId) {
                                 link.classList.add('bg-white/10');
-                                if(dot) dot.classList.add('scale-[1.5]', 'shadow-lg');
+                                if(textEl) {
+                                    textEl.classList.remove('text-zinc-500');
+                                    textEl.classList.add(activeColorClass, 'scale-110');
+                                }
                             } else {
                                 link.classList.remove('bg-white/10');
-                                if(dot) dot.classList.remove('scale-[1.5]', 'shadow-lg');
+                                if(textEl) {
+                                    textEl.classList.remove(activeColorClass, 'scale-110');
+                                    textEl.classList.add('text-zinc-500');
+                                }
                             }
                         });
                     }
