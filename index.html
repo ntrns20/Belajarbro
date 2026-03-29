@@ -269,8 +269,9 @@
                     <div class="w-8 h-8 rounded-[10px] bg-gradient-to-br from-zinc-800 to-zinc-950 border border-white/10 flex items-center justify-center shadow-[0_0_20px_rgba(99,102,241,0.15)] group-hover:border-indigo-500/40 transition-all duration-300">
                         <i data-lucide="code-2" class="w-4 h-4 text-indigo-400"></i>
                     </div>
-                    <h1 class="text-lg font-semibold text-white tracking-tight hidden sm:flex items-center gap-0.5">
-                        Dyerz<span class="text-indigo-400 font-mono text-sm mt-0.5 border-b-2 border-indigo-400/40 leading-none pb-0.5">Dev_</span>
+                    <!-- [MODIFIED] Menghapus class 'hidden sm:flex' agar text muncul di layar mobile -->
+                    <h1 class="text-base sm:text-lg font-semibold text-white tracking-tight flex items-center gap-0.5">
+                        Dyerz<span class="text-indigo-400 font-mono text-xs sm:text-sm mt-0.5 border-b-2 border-indigo-400/40 leading-none pb-0.5">Dev_</span>
                     </h1>
                 </div>
                 
@@ -298,7 +299,8 @@
                     
                     <section id="hero-section" class="animate-fade-in">
                         <div class="mb-8">
-                            <h2 class="text-3xl md:text-4xl font-bold text-white tracking-tight mb-2 truncate" id="greeting-text">Terus Berkembang! ⚡</h2>
+                            <!-- [MODIFIED] Menghapus class 'truncate' dan menambahkan 'leading-tight' agar text wrap di mobile -->
+                            <h2 class="text-2xl sm:text-3xl md:text-4xl font-bold text-white tracking-tight mb-3 leading-tight" id="greeting-text">Terus Berkembang! ⚡</h2>
                             <p class="text-zinc-400 text-base font-normal leading-relaxed" id="greeting-desc">Setiap baris kode yang kamu tulis membawamu selangkah lebih dekat ke tujuan.</p>
                         </div>
                         
