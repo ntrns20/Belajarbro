@@ -1,0 +1,1557 @@
+<!DOCTYPE html>
+<html lang="id" class="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0, viewport-fit=cover">
+    <title>DyerzDev | Modul PPLG</title>
+    
+    <!-- PWA Meta Tags -->
+    <meta name="theme-color" content="#000000">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="description" content="Platform pembelajaran lengkap jurusan PPLG Kurikulum Merdeka.">
+    
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            future: {
+                hoverOnlyWhenSupported: true,
+            },
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                        mono: ['JetBrains Mono', 'monospace'],
+                    },
+                    colors: {
+                        amoled: '#000000', 
+                        surface: '#0a0a0c', 
+                        surface2: '#121214',
+                        borderGray: 'rgba(255, 255, 255, 0.06)',
+                        borderHover: 'rgba(255, 255, 255, 0.12)',
+                        skeleton: 'rgba(255, 255, 255, 0.03)',
+                    },
+                    boxShadow: {
+                        'glow': '0 0 40px -10px rgba(99, 102, 241, 0.15)',
+                        'card-hover': '0 20px 40px -15px rgba(0,0,0,0.5), 0 0 20px -5px rgba(255,255,255,0.03)',
+                    }
+                }
+            }
+        }
+    </script>
+
+    <!-- Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+
+    <style>
+        * {
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        html, body {
+            overscroll-behavior-y: none;
+            background-color: #000000;
+        }
+
+        html {
+            scroll-behavior: smooth;
+        }
+
+        .app-initializing {
+            opacity: 0;
+            pointer-events: none;
+            visibility: hidden;
+        }
+        
+        .app-ready {
+            opacity: 1;
+            transition: opacity 0.8s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        #initial-loader {
+            position: fixed; inset: 0; z-index: 9999; background: #000000;
+            display: flex; flex-direction: column; align-items: center; justify-content: center;
+            transition: opacity 0.6s ease, visibility 0.6s ease;
+        }
+
+        ::-webkit-scrollbar {
+            width: 4px;
+            height: 4px;
+        }
+        ::-webkit-scrollbar-track {
+            background: transparent;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: rgba(255, 255, 255, 0.2);
+        }
+        
+        .no-scrollbar {
+            -ms-overflow-style: none;
+            scrollbar-width: none;
+            -webkit-overflow-scrolling: touch;
+        }
+        .no-scrollbar::-webkit-scrollbar {
+            display: none;
+        }
+
+        input[type="search"]::-webkit-search-decoration,
+        input[type="search"]::-webkit-search-cancel-button,
+        input[type="search"]::-webkit-search-results-button,
+        input[type="search"]::-webkit-search-results-decoration {
+            -webkit-appearance: none;
+        }
+
+        .module-card {
+            transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        .floating-tooltip {
+            position: absolute;
+            bottom: calc(100% + 16px);
+            left: 50%;
+            transform: translateX(-50%) translateY(10px) scale(0.95);
+            background-color: rgba(20, 20, 22, 0.85);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            color: #fff;
+            padding: 0.5rem 0.8rem;
+            border-radius: 0.75rem;
+            font-size: 0.75rem;
+            font-weight: 500;
+            letter-spacing: 0.025em;
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+            z-index: 60;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            box-shadow: 0 10px 30px -5px rgba(0,0,0,0.5);
+            white-space: nowrap;
+            pointer-events: none;
+        }
+
+        @media (hover: hover) and (pointer: fine) {
+            .nav-item:hover .floating-tooltip, .main-nav-item:hover .floating-tooltip {
+                opacity: 1;
+                visibility: visible;
+                transform: translateX(-50%) translateY(0) scale(1);
+            }
+            .module-card:hover {
+                transform: translateY(-4px) scale(1.01);
+                border-color: rgba(255, 255, 255, 0.15); 
+            }
+        }
+
+        @media (max-width: 767px) {
+            .header-search-active #logo-wrapper {
+                display: none !important;
+            }
+            .header-search-active #search-container {
+                max-width: 100% !important;
+                width: 100% !important;
+            }
+            .header-search-active #search-input {
+                opacity: 1 !important;
+                pointer-events: auto !important;
+            }
+        }
+
+        @keyframes smoothFadeIn {
+            from { opacity: 0; transform: translateY(15px); filter: blur(4px); }
+            to { opacity: 1; transform: translateY(0); filter: blur(0); }
+        }
+        
+        .animate-fade-in {
+            animation: smoothFadeIn 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+        }
+
+        .nav-wrapper-mask {
+            position: fixed;
+            bottom: max(0.75rem, env(safe-area-inset-bottom));
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 50;
+            border-radius: 9999px;
+            width: max-content;
+            max-width: calc(100vw - 1.5rem);
+            transition: all 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        @media (min-width: 640px) {
+            .nav-wrapper-mask { bottom: 1rem; }
+        }
+        @media (min-width: 1024px) {
+            .nav-wrapper-mask { bottom: 1.25rem; }
+        }
+
+        .nav-wrapper-mask::before, .nav-wrapper-mask::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            bottom: 0;
+            width: 32px;
+            pointer-events: none;
+            z-index: 10;
+        }
+        .nav-wrapper-mask::before {
+            left: 0;
+            background: linear-gradient(to right, rgba(0, 0, 0, 0.8), transparent);
+            border-top-left-radius: 9999px;
+            border-bottom-left-radius: 9999px;
+        }
+        .nav-wrapper-mask::after {
+            right: 0;
+            background: linear-gradient(to left, rgba(0, 0, 0, 0.8), transparent);
+            border-top-right-radius: 9999px;
+            border-bottom-right-radius: 9999px;
+        }
+        
+        .nav-hidden {
+            transform: translateX(-50%) translateY(150%) scale(0.9) !important;
+            opacity: 0 !important;
+            pointer-events: none !important;
+            visibility: hidden !important;
+        }
+
+        @keyframes premiumShimmer {
+            0% { background-position: -1000px 0; }
+            100% { background-position: 1000px 0; }
+        }
+        .skeleton-shimmer {
+            background: rgba(255, 255, 255, 0.02);
+            background-image: linear-gradient(90deg, rgba(255, 255, 255, 0.01) 0%, rgba(255, 255, 255, 0.05) 50%, rgba(255, 255, 255, 0.01) 100%);
+            background-repeat: no-repeat;
+            background-size: 1000px 100%;
+            animation: premiumShimmer 2s infinite linear forwards;
+        }
+
+        .nav-scroll-grab { cursor: grab; }
+        .nav-scroll-grabbing {
+            cursor: grabbing !important;
+            scroll-behavior: auto !important;
+        }
+        .nav-scroll-grabbing * { user-select: none; }
+
+        .bg-glow {
+            position: absolute;
+            top: -20%;
+            left: -10%;
+            width: 70vw;
+            height: 70vw;
+            background: radial-gradient(circle, rgba(99,102,241,0.08) 0%, rgba(0,0,0,0) 70%);
+            pointer-events: none;
+            z-index: 0;
+        }
+    </style>
+    <script>
+        // GLOBAL CONSTANTS: Offline Asset Fallback (Base64 SVG Avatar)
+        window.DEFAULT_AVATAR = "data:image/svg+xml;charset=UTF-8,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%23121214' stroke='%23818cf8' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Ccircle cx='12' cy='8' r='5'/%3E%3Cpath d='M20 21a8 8 0 0 0-16 0'/%3E%3C/svg%3E";
+    </script>
+</head>
+<body class="bg-amoled text-zinc-300 font-sans h-[100dvh] flex flex-col overflow-hidden selection:bg-indigo-500/30 relative">
+
+    <!-- FOUC Loading Overlay -->
+    <div id="initial-loader">
+        <div class="w-16 h-16 rounded-[1rem] bg-gradient-to-br from-zinc-800 to-zinc-950 border border-white/10 flex items-center justify-center animate-pulse shadow-[0_0_30px_rgba(99,102,241,0.2)]">
+            <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#818cf8" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="animate-bounce"><polyline points="16 18 22 12 16 6"></polyline><polyline points="8 6 2 12 8 18"></polyline></svg>
+        </div>
+        <p class="text-zinc-500 text-sm mt-4 font-medium tracking-widest uppercase animate-pulse">Menyiapkan Workspace...</p>
+    </div>
+
+    <div id="app-wrapper" class="app-initializing flex flex-col h-full w-full relative">
+        <div class="bg-glow"></div>
+
+        <div id="offline-toast" style="top: max(1rem, env(safe-area-inset-top));" class="fixed left-1/2 -translate-x-1/2 z-50 bg-rose-500/90 text-white px-5 py-3 rounded-full text-xs md:text-sm font-medium shadow-[0_10px_40px_-10px_rgba(244,63,94,0.5)] flex items-center gap-3 transition-all duration-500 transform -translate-y-24 opacity-0 pointer-events-none backdrop-blur-xl border border-rose-400/30">
+            <i data-lucide="wifi-off" class="w-4 h-4 md:w-5 md:h-5"></i>
+            <span>Koneksi terputus. Mode offline aktif.</span>
+        </div>
+        
+        <div id="progress-toast" style="top: max(1rem, env(safe-area-inset-top));" class="fixed left-1/2 -translate-x-1/2 z-50 bg-indigo-500/90 text-white px-5 py-3 rounded-full text-xs md:text-sm font-medium shadow-[0_10px_40px_-10px_rgba(99,102,241,0.5)] flex items-center gap-3 transition-all duration-500 transform -translate-y-24 opacity-0 pointer-events-none backdrop-blur-xl border border-indigo-400/30">
+            <i data-lucide="info" class="w-4 h-4 md:w-5 md:h-5"></i>
+            <span>Status modul diperbarui!</span>
+        </div>
+
+        <div id="storage-error-toast" style="top: max(1rem, env(safe-area-inset-top));" class="fixed left-1/2 -translate-x-1/2 z-50 bg-rose-500/90 text-white px-5 py-3 rounded-full text-xs md:text-sm font-medium shadow-[0_10px_40px_-10px_rgba(244,63,94,0.5)] flex items-center gap-3 transition-all duration-500 transform -translate-y-24 opacity-0 pointer-events-none backdrop-blur-xl border border-rose-400/30">
+            <i data-lucide="hard-drive" class="w-4 h-4 md:w-5 md:h-5"></i>
+            <span>Gagal menyimpan: Memori penuh atau diblokir.</span>
+        </div>
+
+        <div id="search-overlay" class="fixed inset-0 top-[4.5rem] bg-black/60 backdrop-blur-sm z-[35] opacity-0 pointer-events-none transition-opacity duration-300"></div>
+
+        <main class="flex-1 flex flex-col h-full relative overflow-hidden bg-transparent w-full z-10">
+            
+            <header id="main-header" style="padding-top: max(0.75rem, env(safe-area-inset-top)); padding-bottom: 0.75rem;" class="flex items-center justify-between px-5 md:px-8 min-h-[4.5rem] border-b border-borderGray bg-amoled/60 backdrop-blur-2xl sticky top-0 z-40 gap-4 transition-all duration-300">
+                <div id="logo-wrapper" onclick="resetAndScrollTop()" class="flex items-center gap-3 shrink-0 cursor-pointer group">
+                    <div class="w-8 h-8 rounded-[10px] bg-gradient-to-br from-zinc-800 to-zinc-950 border border-white/10 flex items-center justify-center shadow-[0_0_20px_rgba(99,102,241,0.15)] group-hover:border-indigo-500/40 group-hover:shadow-[0_0_20px_rgba(99,102,241,0.3)] transition-all duration-300">
+                        <i data-lucide="code-2" class="w-4 h-4 text-indigo-400"></i>
+                    </div>
+                    <h1 class="text-lg font-semibold text-white tracking-tight hidden sm:flex items-center gap-0.5">
+                        Dyerz<span class="text-indigo-400 font-mono text-sm mt-0.5 border-b-2 border-indigo-400/40 leading-none pb-0.5">Dev_</span>
+                    </h1>
+                </div>
+                
+                <div class="flex-1 flex justify-end md:justify-center relative">
+                    <div id="search-container" class="flex items-center bg-white/[0.03] border border-borderGray rounded-full px-4 py-2 w-full max-w-[44px] md:max-w-md hover:bg-white/[0.05] focus-within:bg-white/[0.05] focus-within:border-indigo-500/50 focus-within:ring-4 focus-within:ring-indigo-500/10 transition-all duration-300 group overflow-hidden cursor-text backdrop-blur-md shadow-inner">
+                        <i data-lucide="search" class="w-4 h-4 text-zinc-400 group-focus-within:text-indigo-400 transition-colors shrink-0" onclick="document.getElementById('search-input').focus()"></i>
+                        <input id="search-input" aria-label="Cari Materi" type="search" placeholder="Cari materi HTML, Java..." class="bg-transparent border-none outline-none text-sm text-zinc-100 ml-3 w-full placeholder-zinc-500 opacity-0 md:opacity-100 group-focus-within:opacity-100 transition-opacity duration-300">
+                        
+                        <button id="search-clear-btn" aria-label="Hapus Pencarian" class="hidden shrink-0 text-zinc-500 hover:text-white hover:bg-white/10 focus:outline-none w-7 h-7 flex items-center justify-center rounded-full transition-all ml-2">
+                            <i data-lucide="x" class="w-3.5 h-3.5"></i>
+                        </button>
+
+                        <div class="hidden md:flex items-center gap-1.5 text-[10px] text-zinc-500 font-medium ml-3 shrink-0">
+                            <kbd class="bg-white/5 px-2 py-1 rounded-md border border-white/10 shadow-sm">Ctrl</kbd>
+                            <kbd class="bg-white/5 px-2 py-1 rounded-md border border-white/10 shadow-sm">K</kbd>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="hidden md:block w-[116px] shrink-0 pointer-events-none"></div>
+            </header>
+
+            <div class="flex-1 overflow-y-auto p-5 md:p-8 lg:p-10 pb-0 relative no-scrollbar" id="scroll-area">
+                <div class="max-w-7xl mx-auto space-y-12 md:space-y-16">
+                    
+                    <section id="hero-section" class="animate-fade-in">
+                        <div class="mb-8">
+                            <h2 class="text-3xl md:text-4xl font-bold text-white tracking-tight mb-2 truncate" id="greeting-text">Terus Berkembang! ⚡</h2>
+                            <p class="text-zinc-400 text-base font-normal leading-relaxed" id="greeting-desc">Setiap baris kode yang kamu tulis membawamu selangkah lebih dekat ke tujuan.</p>
+                        </div>
+                        
+                        <div id="hero-card" tabindex="0" role="button" onkeydown="if(event.key==='Enter' || event.key===' ') { event.preventDefault(); this.click(); }" class="relative bg-surface border border-borderGray rounded-[2rem] p-6 md:p-8 flex flex-col md:flex-row md:items-center justify-between gap-6 hover:shadow-card-hover group cursor-pointer transition-all focus:outline-none focus-visible:ring-4 focus-visible:ring-emerald-500/50 overflow-hidden">
+                            <div class="absolute inset-0 bg-gradient-to-r from-emerald-500/5 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-duration-500 pointer-events-none"></div>
+
+                            <div class="flex items-start md:items-center gap-5 md:gap-6 pointer-events-none relative z-10">
+                                <div id="hero-icon-wrap" class="min-w-[4rem] w-16 h-16 rounded-[1.2rem] bg-emerald-500/10 border border-emerald-500/20 flex items-center justify-center text-emerald-400 group-hover:scale-110 group-hover:rotate-3 transition-transform duration-500 shadow-[0_0_30px_rgba(16,185,129,0.1)]">
+                                    <i id="hero-icon" data-lucide="briefcase" class="w-8 h-8"></i>
+                                </div>
+                                <div>
+                                    <p id="hero-subtitle" class="text-xs font-semibold text-emerald-400/90 uppercase tracking-widest mb-1.5">Lanjutkan Belajar</p>
+                                    <h3 id="hero-title" class="text-xl md:text-2xl font-bold text-white leading-tight group-hover:text-emerald-300 transition-colors">Memuat Modul...</h3>
+                                    <p id="hero-desc" class="text-sm text-zinc-400 font-normal mt-1.5 leading-snug">Sedang menyesuaikan progress belajar Anda</p>
+                                </div>
+                            </div>
+                            
+                            <div class="flex flex-col gap-3 w-full md:w-56 mt-2 md:mt-0 relative z-10 justify-center">
+                                <div class="flex justify-between items-center text-xs font-medium pointer-events-none bg-white/5 p-3 rounded-xl border border-white/10">
+                                    <span class="text-zinc-400">Status Modul</span>
+                                    <span id="hero-status-text" class="text-amber-400 font-bold">Belum Selesai</span>
+                                </div>
+                                
+                                <div class="w-full bg-white text-black hover:bg-zinc-200 flex items-center justify-center gap-2 font-semibold text-sm py-3 px-4 rounded-xl transition-all shadow-[0_0_20px_rgba(255,255,255,0.15)] active:scale-95 pointer-events-none">
+                                    <i data-lucide="book-open" class="w-4 h-4 btn-text"></i>
+                                    <span class="btn-text">Buka Modul</span>
+                                    <i data-lucide="loader-2" class="w-4 h-4 animate-spin hidden btn-spinner text-black"></i>
+                                </div>
+                            </div>
+                        </div>
+                    </section>
+
+                    <div id="curriculum-container" class="space-y-16 animate-fade-in relative min-h-[300px] z-10">
+                        <!-- Konten modul akan dirender di sini oleh JS -->
+                    </div>
+
+                    <div id="search-empty-state" class="hidden flex-col items-center justify-center py-8 md:py-12 text-center w-full animate-fade-in z-10 relative">
+                        <div class="w-24 h-24 bg-surface border border-borderGray rounded-3xl flex items-center justify-center text-zinc-600 mb-6 shadow-inner relative overflow-hidden">
+                            <div class="absolute inset-0 bg-gradient-to-tr from-white/5 to-transparent"></div>
+                            <i data-lucide="search-x" class="w-10 h-10 relative z-10"></i>
+                        </div>
+                        <h3 class="text-2xl font-bold text-white tracking-tight mb-3">Modul Tidak Ditemukan</h3>
+                        <p class="text-zinc-400 text-base max-w-md mx-auto mb-8 leading-relaxed">Kami tidak dapat menemukan materi yang cocok dengan kata kunci <br/><span class="text-indigo-400 font-medium whitespace-nowrap">"<span id="keyword-display"></span>"</span>.</p>
+                        
+                        <button id="btn-reset-search" class="px-6 py-3 bg-white/5 text-white text-sm font-medium rounded-xl border border-white/10 hover:bg-white/10 active:scale-95 transition-all focus:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500 mb-4 backdrop-blur-md shadow-lg">
+                            Kembali ke Semua Modul
+                        </button>
+
+                        <div class="mt-8 md:mt-10 pt-8 border-t border-borderGray w-full max-w-md">
+                            <p class="text-xs text-zinc-500 mb-4 uppercase tracking-widest font-semibold">Coba Topik Populer:</p>
+                            <div class="flex flex-wrap justify-center gap-2.5">
+                                <button onclick="setSearchQuery('HTML')" class="px-4 py-2 bg-surface border border-borderGray rounded-full text-sm text-zinc-300 hover:text-white hover:border-white/20 hover:bg-white/5 active:scale-95 transition-all focus:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500">HTML</button>
+                                <button onclick="setSearchQuery('Java')" class="px-4 py-2 bg-surface border border-borderGray rounded-full text-sm text-zinc-300 hover:text-white hover:border-white/20 hover:bg-white/5 active:scale-95 transition-all focus:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500">Java</button>
+                                <button onclick="setSearchQuery('Figma')" class="px-4 py-2 bg-surface border border-borderGray rounded-full text-sm text-zinc-300 hover:text-white hover:border-white/20 hover:bg-white/5 active:scale-95 transition-all focus:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500">Figma</button>
+                                <button onclick="setSearchQuery('Website')" class="px-4 py-2 bg-surface border border-borderGray rounded-full text-sm text-zinc-300 hover:text-white hover:border-white/20 hover:bg-white/5 active:scale-95 transition-all focus:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500">Website</button>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+                
+                <div id="bottom-spacer" class="w-full shrink-0 pointer-events-none" style="height: 120px;"></div>
+
+            </div>
+        </main>
+
+        <div id="panel-backdrop" onclick="closeModulePanel()" class="fixed inset-0 bg-black/60 backdrop-blur-sm z-[60] opacity-0 pointer-events-none transition-opacity duration-500 ease-out"></div>
+        <div id="module-panel" aria-modal="true" role="dialog" class="fixed inset-y-0 right-0 w-full sm:w-[440px] md:w-[480px] bg-surface/95 backdrop-blur-3xl z-[70] transform translate-x-full transition-transform duration-500 cubic-bezier(0.16, 1, 0.3, 1) shadow-2xl flex flex-col border-l border-white/5 outline-none" tabindex="-1">
+            <div class="w-12 h-1.5 bg-white/20 rounded-full mx-auto mt-4 sm:hidden absolute top-0 left-1/2 -translate-x-1/2"></div>
+            
+            <div style="padding-top: max(1.5rem, env(safe-area-inset-top));" class="flex items-center justify-between p-5 md:p-8 border-b border-borderGray">
+                <h3 class="text-lg font-semibold text-white tracking-tight flex items-center gap-2.5">
+                    <i data-lucide="book-open" class="w-5 h-5 text-indigo-400"></i>
+                    Detail Modul
+                </h3>
+                <button onclick="closeModulePanel()" id="btn-close-panel" aria-label="Tutup Panel" class="p-2.5 text-zinc-400 hover:text-white bg-white/5 hover:bg-white/10 border border-transparent hover:border-white/10 rounded-full transition-all focus:outline-none focus-visible:ring-2 focus-visible:ring-white/20">
+                    <i data-lucide="x" class="w-4 h-4"></i>
+                </button>
+            </div>
+            <div style="padding-bottom: max(2rem, env(safe-area-inset-bottom));" class="flex-1 overflow-y-auto p-6 md:p-10 flex flex-col items-center justify-center text-center">
+                <div id="panel-icon-wrap" class="w-28 h-28 rounded-[2rem] flex items-center justify-center mb-8 shadow-2xl border relative overflow-hidden">
+                    <div class="absolute inset-0 bg-gradient-to-b from-white/10 to-transparent"></div>
+                    <i id="panel-icon" data-lucide="book" class="w-12 h-12 relative z-10"></i>
+                </div>
+                
+                <h4 id="panel-title" class="text-2xl md:text-3xl font-bold text-white tracking-tight mb-4 leading-tight">Judul Modul</h4>
+                <p id="panel-desc" class="text-zinc-400 text-base mb-10 leading-relaxed max-w-sm">Deskripsi modul akan muncul di sini.</p>
+                
+                <div class="w-full max-w-sm space-y-3">
+                    <button id="btn-read-module" onclick="closeModulePanel()" class="w-full py-3.5 bg-white text-black font-semibold rounded-2xl transition-all shadow-[0_0_20px_rgba(255,255,255,0.15)] hover:bg-zinc-200 active:scale-[0.98] flex items-center justify-center gap-2 focus:outline-none focus-visible:ring-2 focus-visible:ring-white">
+                        <span>Baca Modul</span>
+                        <i data-lucide="book-open" class="w-4 h-4"></i>
+                    </button>
+                    <button id="btn-toggle-done" onclick="toggleStatusSelesai()" class="w-full py-3.5 bg-transparent hover:bg-emerald-500/10 text-emerald-400 font-medium rounded-2xl transition-all border border-emerald-500/30 hover:border-emerald-500/50 active:scale-[0.98] flex items-center justify-center gap-2 focus:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500">
+                        <span id="btn-toggle-text">Tandai Selesai</span>
+                        <i id="btn-toggle-icon" data-lucide="check-circle" class="w-4 h-4"></i>
+                        <i id="btn-toggle-loader" data-lucide="loader-2" class="w-4 h-4 animate-spin hidden"></i>
+                    </button>
+                    <button onclick="closeModulePanel()" class="w-full py-3.5 bg-transparent hover:bg-white/5 text-zinc-300 font-medium rounded-2xl transition-all border border-borderGray hover:border-white/10 active:scale-[0.98] focus:outline-none focus-visible:ring-2 focus-visible:ring-white/20">
+                        Tutup
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <div id="bottom-nav-wrapper" class="nav-wrapper-mask shadow-[0_30px_60px_-15px_rgba(0,0,0,1)] rounded-full">
+            <nav id="bottom-nav" class="nav-scroll-grab flex bg-[#161618]/80 backdrop-blur-3xl border border-white/10 rounded-full px-2 py-2 sm:px-3 sm:py-2.5 items-center gap-1 sm:gap-2 transition-all duration-500 w-max max-w-full overflow-x-auto no-scrollbar snap-x snap-mandatory relative z-20 shadow-inner">
+                
+                <a href="index.html" aria-label="Menu Beranda" draggable="false" class="main-nav-item text-white snap-center w-12 h-12 sm:w-14 sm:h-14 rounded-[1.25rem] flex items-center justify-center hover:bg-white/5 active:scale-95 transition-all duration-300 group relative shrink-0 focus:outline-none focus-visible:ring-2 focus-visible:ring-white/20 select-none">
+                    <i data-lucide="layout-dashboard" class="w-5 h-5 sm:w-6 sm:h-6 text-indigo-400 group-hover:-translate-y-0.5 transition-all duration-300 relative z-10 pointer-events-none"></i>
+                    <div class="active-indicator absolute inset-0 rounded-[1.25rem] bg-white/10 transition-opacity duration-300 pointer-events-none"></div>
+                    <div class="active-dot absolute bottom-1.5 w-1 h-1 rounded-full bg-white transition-all duration-300 shadow-[0_0_8px_rgba(255,255,255,0.8)] pointer-events-none"></div>
+                    <span class="floating-tooltip hidden md:block">Beranda</span>
+                </a>
+
+                <div class="snap-center w-px h-6 sm:h-8 bg-white/10 mx-1.5 shrink-0 rounded-full"></div>
+
+                <a href="#kelas-10" aria-label="Scroll ke Kelas 10" draggable="false" class="nav-fase-link snap-center nav-item w-12 h-12 sm:w-14 sm:h-14 rounded-[1.25rem] flex items-center justify-center hover:bg-white/5 active:scale-95 transition-all duration-300 group relative shrink-0 focus:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500 select-none">
+                    <div class="nav-dot w-2.5 h-2.5 sm:w-3 sm:h-3 rounded-full bg-emerald-500 shadow-[0_0_12px_rgba(16,185,129,0.6)] group-hover:scale-125 transition-all duration-300 pointer-events-none"></div>
+                    <span class="floating-tooltip hidden md:block">Kelas 10</span>
+                </a>
+                
+                <a href="#kelas-11" aria-label="Scroll ke Kelas 11" draggable="false" class="nav-fase-link snap-center nav-item w-12 h-12 sm:w-14 sm:h-14 rounded-[1.25rem] flex items-center justify-center hover:bg-white/5 active:scale-95 transition-all duration-300 group relative shrink-0 focus:outline-none focus-visible:ring-2 focus-visible:ring-amber-500 select-none">
+                    <div class="nav-dot w-2.5 h-2.5 sm:w-3 sm:h-3 rounded-full bg-amber-500 shadow-[0_0_12px_rgba(245,158,11,0.6)] group-hover:scale-125 transition-all duration-300 pointer-events-none"></div>
+                    <span class="floating-tooltip hidden md:block">Kelas 11</span>
+                </a>
+                
+                <a href="#kelas-12" aria-label="Scroll ke Kelas 12" draggable="false" class="nav-fase-link snap-center nav-item w-12 h-12 sm:w-14 sm:h-14 rounded-[1.25rem] flex items-center justify-center hover:bg-white/5 active:scale-95 transition-all duration-300 group relative shrink-0 focus:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500 select-none">
+                    <div class="nav-dot w-2.5 h-2.5 sm:w-3 sm:h-3 rounded-full bg-indigo-500 shadow-[0_0_12px_rgba(99,102,241,0.6)] group-hover:scale-125 transition-all duration-300 pointer-events-none"></div>
+                    <span class="floating-tooltip hidden md:block">Kelas 12</span>
+                </a>
+
+                <div class="snap-center w-px h-6 sm:h-8 bg-white/10 mx-1.5 shrink-0 rounded-full"></div>
+
+                <a href="profil.html" aria-label="Profil Pengguna dan Pengaturan" draggable="false" class="snap-center main-nav-item nav-item w-12 h-12 sm:w-14 sm:h-14 rounded-[1.25rem] flex items-center justify-center hover:bg-white/5 active:scale-95 transition-all duration-300 group relative shrink-0 focus:outline-none focus-visible:ring-2 focus-visible:ring-white/20 select-none">
+                    <img id="nav-user-avatar" src="https://api.dicebear.com/7.x/avataaars/svg?seed=Felix&backgroundColor=121214" onerror="this.onerror=null; this.src=window.DEFAULT_AVATAR;" alt="User" draggable="false" class="w-8 h-8 sm:w-9 sm:h-9 object-cover rounded-full bg-surface border border-white/20 group-hover:border-white/50 group-hover:scale-105 transition-all duration-300 pointer-events-none shadow-lg">
+                    <span class="floating-tooltip hidden md:block">Profil & Pengaturan</span>
+                </a>
+            </nav>
+        </div>
+    </div>
+
+    <script>
+        class ToastQueue {
+            constructor() {
+                this.queue = [];
+                this.isShowing = false;
+            }
+            show(elementId) {
+                this.queue.push(elementId);
+                if (!this.isShowing) this.processNext();
+            }
+            processNext() {
+                if (this.queue.length === 0) {
+                    this.isShowing = false;
+                    return;
+                }
+                this.isShowing = true;
+                const elId = this.queue.shift();
+                const el = document.getElementById(elId);
+                
+                if (el) {
+                    el.classList.remove('-translate-y-24', 'opacity-0', 'pointer-events-none');
+                    el.classList.add('translate-y-0', 'opacity-100');
+                    setTimeout(() => {
+                        el.classList.remove('translate-y-0', 'opacity-100');
+                        el.classList.add('-translate-y-24', 'opacity-0', 'pointer-events-none');
+                        setTimeout(() => this.processNext(), 500); 
+                    }, 3000);
+                } else {
+                    this.processNext();
+                }
+            }
+        }
+        const toastManager = new ToastQueue();
+
+        function hideLoader() {
+            const loader = document.getElementById('initial-loader');
+            const app = document.getElementById('app-wrapper');
+            loader.style.opacity = '0';
+            loader.style.visibility = 'hidden';
+            app.classList.remove('app-initializing');
+            app.classList.add('app-ready');
+            if (window.lucide) {
+                lucide.createIcons();
+            }
+        }
+
+        window.addEventListener('load', () => {
+            let isLoaded = false;
+            const checkDependencies = setInterval(() => {
+                if (window.lucide && window.tailwind) {
+                    clearInterval(checkDependencies);
+                    isLoaded = true;
+                    hideLoader();
+                }
+            }, 50);
+
+            setTimeout(() => {
+                if (!isLoaded) {
+                    clearInterval(checkDependencies);
+                    console.warn("Dependencies failed to load in time. Booting in fallback mode.");
+                    hideLoader();
+                    if (!window.tailwind) {
+                        document.body.style.backgroundColor = '#000';
+                        document.body.style.color = '#fff';
+                    }
+                }
+            }, 8000);
+        });
+
+        function debounce(func, wait) {
+            let timeout;
+            return function(...args) {
+                clearTimeout(timeout);
+                timeout = setTimeout(() => func.apply(this, args), wait);
+            };
+        }
+
+        const scrollArea = document.getElementById('scroll-area');
+        scrollArea.addEventListener('scroll', debounce(() => {
+            if (sessionStorage) {
+                sessionStorage.setItem('dyerzdev_scroll_index', scrollArea.scrollTop);
+            }
+        }, 150));
+
+        function getSafeData(key, defaultData) {
+            try {
+                const item = localStorage.getItem(key);
+                if (!item) return defaultData;
+                return JSON.parse(item);
+            } catch (error) {
+                console.warn(`Data '${key}' corrupt, melakukan reset otomatis...`);
+                localStorage.setItem(key, JSON.stringify(defaultData));
+                return defaultData;
+            }
+        }
+
+        function setSafeData(key, data) {
+            try {
+                localStorage.setItem(key, JSON.stringify(data));
+                return true;
+            } catch(e) { 
+                console.error("Gagal menyimpan ke localStorage. Kemungkinan Kuota penuh atau Incognito Mode.", e); 
+                toastManager.show('storage-error-toast');
+                return false;
+            }
+        }
+
+        let currentActiveModuleRef = null;
+        let isOffline = !navigator.onLine;
+
+        function adjustSpacer() {
+            const navWrapper = document.getElementById('bottom-nav-wrapper');
+            const spacer = document.getElementById('bottom-spacer');
+            if(navWrapper && spacer) {
+                spacer.style.height = (navWrapper.offsetHeight + 40) + 'px';
+            }
+        }
+        window.addEventListener('load', adjustSpacer);
+        window.addEventListener('resize', adjustSpacer);
+
+        function loadUserProfileData() {
+            const profileData = getSafeData('dyerzdev_user_profile', {});
+            const greetingText = document.getElementById('greeting-text');
+            const greetingDesc = document.getElementById('greeting-desc');
+            
+            let displayName = "Developer";
+            if (profileData.name) {
+                displayName = profileData.name.length > 20 ? profileData.name.substring(0, 20) + '...' : profileData.name;
+            }
+
+            const dailyGreetings = [
+                {
+                    title: `Terus Berkembang, ${displayName}! ⚡`,
+                    desc: "Setiap baris kode yang kamu tulis membawamu selangkah lebih dekat ke tujuan. Mari tuntaskan misi belajarmu hari ini."
+                },
+                {
+                    title: `Fokus & Eksekusi, ${displayName}. 💻`,
+                    desc: "Pemahaman logika dibangun dari konsistensi. Siapkan dirimu dan selesaikan modul yang sedang menunggumu."
+                },
+                {
+                    title: `Jangan Berhenti, ${displayName}! 🚀`,
+                    desc: "Kamu sudah melangkah cukup jauh. Segarkan pikiranmu, buka kembali materinya, dan perkuat fondasi logikamu."
+                },
+                {
+                    title: `Waktunya Ngoding, ${displayName}. 🎯`,
+                    desc: "Membaca teori saja tidak cukup, saatnya terjun ke praktik. Lanjutkan progres belajarmu sekarang juga."
+                },
+                {
+                    title: `Satu Langkah Lagi, ${displayName}! 🛠️`,
+                    desc: "Aplikasi hebat dibangun dari baris kode demi baris kode. Fokuskan energimu dan selesaikan modul aktifmu."
+                },
+                {
+                    title: `Tetap Konsisten, ${displayName}. 💡`,
+                    desc: "Pola pikir developer lahir dari pemecahan masalah yang berulang. Mari pelajari konsep baru dan tantang dirimu hari ini."
+                },
+                {
+                    title: `Lampaui Batasmu, ${displayName}! 🔥`,
+                    desc: "Error adalah guru terbaik bagi seorang programmer. Jangan menyerah, tuntaskan modulmu dan kuasai teknologinya."
+                }
+            ];
+
+            const today = new Date();
+            const start = new Date(today.getFullYear(), 0, 0);
+            const diff = today - start;
+            const oneDay = 1000 * 60 * 60 * 24;
+            const dayOfYear = Math.floor(diff / oneDay);
+            
+            const greetingIndex = dayOfYear % dailyGreetings.length;
+            const selectedGreeting = dailyGreetings[greetingIndex];
+
+            if (greetingText) {
+                greetingText.textContent = selectedGreeting.title;
+            }
+            if (greetingDesc) {
+                greetingDesc.textContent = selectedGreeting.desc;
+            }
+
+            const navAvatar = document.getElementById('nav-user-avatar');
+            if (navAvatar) {
+                navAvatar.src = profileData.avatar || window.DEFAULT_AVATAR;
+            }
+        }
+
+        document.addEventListener('DOMContentLoaded', loadUserProfileData);
+        
+        window.addEventListener('storage', (event) => {
+            if (event.key === 'dyerzdev_user_profile') {
+                loadUserProfileData();
+            } else if (event.key === 'dyerzdev_progress') {
+                userProgressMap = getSafeData('dyerzdev_progress', {});
+                syncProgressData();
+                updateHeroCard();
+                
+                curriculumData.forEach(phase => {
+                    phase.modules.forEach(mod => {
+                        updateModuleCardDOM(mod);
+                    });
+                });
+            }
+        });
+
+        const rawCurriculumData = [
+            {
+                phaseId: 'kelas-10', phaseName: 'Kelas 10', grade: 'Dasar Program Keahlian', description: 'Fondasi utama dan dasar kompetensi keahlian PPLG.',
+                modules: [
+                    { id: 'm1', title: 'Proses Bisnis PPLG', desc: 'Pemahaman tentang industri perangkat lunak, perencanaan produk, dan siklus pengembangan aplikasi.', icon: 'briefcase', color: 'emerald', isCompleted: false },
+                    { id: 'm2', title: 'Perkembangan Teknologi', desc: 'Mengenal IoT, Cloud Computing, AI, Keamanan Informasi, dan isu global di bidang teknologi masa kini.', icon: 'globe', color: 'blue', isCompleted: false },
+                    { id: 'm3', title: 'Profesi & Kewirausahaan', desc: 'Mengenal job profile IT (Programmer, UI/UX, DBA) dan peluang bisnis kreatif (Technopreneur).', icon: 'award', color: 'amber', isCompleted: false },
+                    { id: 'm4', title: 'K3LH & Budaya Kerja', desc: 'Keselamatan, kesehatan kerja, lingkungan hidup, dan penerapan budaya kerja industri (5R).', icon: 'shield-check', color: 'rose', isCompleted: false },
+                    { id: 'm5', title: 'Sistem Komputer & Jaringan', desc: 'Arsitektur komputer, instalasi OS, perangkat keras dasar, dan pemahaman topologi jaringan.', icon: 'cpu', color: 'sky', isCompleted: false },
+                    { id: 'm6', title: 'Logika & Algoritma', desc: 'Pengenalan logika dasar, pembuatan flowchart, pseudocode, dan penyelesaian masalah komputasional.', icon: 'git-commit', color: 'orange', isCompleted: false },
+                    { id: 'm7', title: 'Pemrograman Dasar (C/C++)', desc: 'Struktur data dasar, tipe data, perulangan, percabangan, dan implementasi koding dasar terstruktur.', icon: 'terminal-square', color: 'indigo', isCompleted: false },
+                    { id: 'm8', title: 'Pemrograman Web Dasar', desc: 'Membangun kerangka halaman web dengan HTML5 dan styling dasar menggunakan CSS3.', icon: 'layout', color: 'pink', isCompleted: false },
+                    { id: 'm9', title: 'Pengenalan Basis Data', desc: 'Konsep dasar penyimpanan data, hierarki basis data, dan entitas dalam arsitektur basis data.', icon: 'database', color: 'violet', isCompleted: false },
+                    { id: 'm10', title: 'Tools & Version Control Dasar', desc: 'Pengenalan Integrated Development Environment (IDE) dan dasar Git untuk manajemen kode.', icon: 'wrench', color: 'emerald', isCompleted: false }
+                ]
+            },
+            {
+                phaseId: 'kelas-11', phaseName: 'Kelas 11', grade: 'Konsentrasi Keahlian 1', description: 'Pendalaman materi Konsentrasi Keahlian PPLG dan keterampilan praktis.',
+                modules: [
+                    { id: 'm11', title: 'Basis Data Relasional', desc: 'Konsep RDBMS, DDL, DML, perancangan ERD, dan penggunaan sistem manajemen database MySQL/PostgreSQL.', icon: 'database', color: 'sky', isCompleted: false },
+                    { id: 'm12', title: 'Web Front-End Lanjut', desc: 'Manipulasi DOM dengan JavaScript, responsivitas web, dan styling tingkat lanjut (Tailwind/Bootstrap).', icon: 'monitor', color: 'orange', isCompleted: false },
+                    { id: 'm13', title: 'Pemrograman Berorientasi Objek', desc: 'Penerapan OOP dengan Java/C++, class, object, method, dan konsep encapsulation dasar.', icon: 'box', color: 'purple', isCompleted: false },
+                    { id: 'm14', title: 'Desain Antarmuka (UI/UX)', desc: 'Wireframing, prototyping, prinsip desain antarmuka, dan penggunaan tools industri seperti Figma.', icon: 'layout-template', color: 'pink', isCompleted: false },
+                    { id: 'm15', title: 'Pemrograman Web Back-End', desc: 'Pengenalan arsitektur server-side, pengolahan form, dan integrasi database menggunakan PHP Native.', icon: 'server-cog', color: 'indigo', isCompleted: false },
+                    { id: 'm16', title: 'Kolaborasi Version Control', desc: 'Praktik kolaborasi tim, percabangan (branching), merging, dan manajemen repositori via GitHub.', icon: 'git-branch', color: 'emerald', isCompleted: false },
+                    { id: 'm17', title: 'Perencanaan Produk Kreatif', desc: 'Identifikasi peluang usaha, pembuatan proposal produk IT kreatif, dan perhitungan modal awal.', icon: 'lightbulb', color: 'yellow', isCompleted: false },
+                    { id: 'm18', title: 'API & Web Service Dasar', desc: 'Memahami konsep arsitektur REST, pembuatan endpoint sederhana, dan format data JSON.', icon: 'network', color: 'blue', isCompleted: false },
+                    { id: 'm19', title: 'Framework Web Dasar', desc: 'Pengenalan konsep arsitektur MVC (Model-View-Controller) menggunakan framework seperti CodeIgniter.', icon: 'layers', color: 'red', isCompleted: false },
+                    { id: 'm20', title: 'Pengujian Perangkat Lunak', desc: 'Konsep Software Testing (Blackbox/Whitebox), Quality Assurance, dan pencatatan bug manual.', icon: 'bug', color: 'rose', isCompleted: false }
+                ]
+            },
+            {
+                phaseId: 'kelas-12', phaseName: 'Kelas 12', grade: 'Konsentrasi Keahlian 2', description: 'Tingkat mahir, persiapan proyek industri, dan uji kompetensi keahlian.',
+                modules: [
+                    { id: 'm21', title: 'Web Framework & Fullstack', desc: 'Pengembangan aplikasi skala besar menggunakan framework modern (Laravel untuk Backend, React/Vue untuk Frontend).', icon: 'layers', color: 'red', isCompleted: false },
+                    { id: 'm22', title: 'Pemrograman Perangkat Bergerak', desc: 'Pengembangan aplikasi mobile, lifecycle, state management, dan konsumsi API (Flutter/Android Studio).', icon: 'smartphone', color: 'emerald', isCompleted: false },
+                    { id: 'm23', title: 'Pengembangan Gim Dasar', desc: 'Konsep game engine, manipulasi asset 2D/3D, implementasi fisika, dan scripting game (Unity/Godot).', icon: 'gamepad-2', color: 'violet', isCompleted: false },
+                    { id: 'm24', title: 'Cloud Computing & Deployment', desc: 'Manajemen Virtual Private Server (VPS), dasar Docker container, dan merilis aplikasi ke publik (Hosting).', icon: 'cloud-upload', color: 'blue', isCompleted: false },
+                    { id: 'm25', title: 'Keamanan Sistem Dasar', desc: 'Pengenalan metode enkripsi, sistem autentikasi (JWT), dan pencegahan kerentanan aplikasi (OWASP).', icon: 'lock', color: 'amber', isCompleted: false },
+                    { id: 'm26', title: 'Internet of Things (IoT) Dasar', desc: 'Pemahaman komunikasi perangkat keras dengan aplikasi perangkatgetLocal lunak dan protokol dasar HTTP/MQTT.', icon: 'wifi', color: 'sky', isCompleted: false },
+                    { id: 'm27', title: 'Proyek Akhir (Capstone)', desc: 'Pengerjaan proyek riil berbasis tim secara terstruktur menggunakan metodologi Agile/Scrum layaknya industri.', icon: 'rocket', color: 'emerald', isCompleted: false },
+                    { id: 'm28', title: 'Persiapan Uji Kompetensi Keahlian', desc: 'Simulasi dan pemantapan materi persiapan menghadapi UKK PPLG sesuai standar industri & LSP.', icon: 'graduation-cap', color: 'indigo', isCompleted: false },
+                    { id: 'm29', title: 'Legalitas & Pemasaran Produk', desc: 'Memahami pendaftaran Hak Kekayaan Intelektual (HAKI) dan strategi pemasaran digital untuk aplikasi.', icon: 'megaphone', color: 'orange', isCompleted: false },
+                    { id: 'm30', title: 'Portofolio & Persiapan Karir', desc: 'Panduan pembuatan CV ATS-friendly, kompilasi portofolio di GitHub/Web, dan persiapan teknik interview IT.', icon: 'file-text', color: 'rose', isCompleted: false }
+                ]
+            }
+        ];
+
+        let userProgressMap = getSafeData('dyerzdev_progress', {}); 
+        let curriculumData = JSON.parse(JSON.stringify(rawCurriculumData));
+
+        function syncProgressData() {
+            curriculumData.forEach(phase => {
+                phase.modules.forEach(mod => {
+                    if (userProgressMap[mod.id] !== undefined) {
+                        mod.isCompleted = (userProgressMap[mod.id] === true || userProgressMap[mod.id] === 100);
+                    } else {
+                        mod.isCompleted = false;
+                    }
+                });
+            });
+        }
+        syncProgressData(); 
+
+        const colorMap = {
+            'emerald': { text: 'text-emerald-400', bg: 'bg-emerald-500/10', border: 'border-emerald-500/20', bar: 'bg-emerald-500' },
+            'blue': { text: 'text-blue-400', bg: 'bg-blue-500/10', border: 'border-blue-500/20', bar: 'bg-blue-500' },
+            'amber': { text: 'text-amber-400', bg: 'bg-amber-500/10', border: 'border-amber-500/20', bar: 'bg-amber-500' },
+            'rose': { text: 'text-rose-400', bg: 'bg-rose-500/10', border: 'border-rose-500/20', bar: 'bg-rose-500' },
+            'indigo': { text: 'text-indigo-400', bg: 'bg-indigo-500/10', border: 'border-indigo-500/20', bar: 'bg-indigo-500' },
+            'purple': { text: 'text-purple-400', bg: 'bg-purple-500/10', border: 'border-purple-500/20', bar: 'bg-purple-500' },
+            'sky': { text: 'text-sky-400', bg: 'bg-sky-500/10', border: 'border-sky-500/20', bar: 'bg-sky-500' },
+            'orange': { text: 'text-orange-400', bg: 'bg-orange-500/10', border: 'border-orange-500/20', bar: 'bg-orange-500' },
+            'pink': { text: 'text-pink-400', bg: 'bg-pink-500/10', border: 'border-pink-500/20', bar: 'bg-pink-500' },
+            'yellow': { text: 'text-yellow-400', bg: 'bg-yellow-500/10', border: 'border-yellow-500/20', bar: 'bg-yellow-500' },
+            'red': { text: 'text-red-400', bg: 'bg-red-500/10', border: 'border-red-500/20', bar: 'bg-red-500' },
+            'violet': { text: 'text-violet-400', bg: 'bg-violet-500/10', border: 'border-violet-500/20', bar: 'bg-violet-500' },
+        };
+
+        function updateHeroCard() {
+            let targetModule = null;
+            let targetPhase = null;
+
+            for (const phase of curriculumData) {
+                for (const mod of phase.modules) {
+                    if (!mod.isCompleted) {
+                        targetModule = mod;
+                        targetPhase = phase;
+                        break;
+                    }
+                }
+                if (targetModule) break;
+            }
+
+            if (!targetModule) {
+                targetModule = curriculumData[curriculumData.length - 1].modules.slice(-1)[0];
+                targetPhase = curriculumData[curriculumData.length - 1];
+            }
+
+            const card = document.getElementById('hero-card');
+            const iconWrap = document.getElementById('hero-icon-wrap');
+            const icon = document.getElementById('hero-icon');
+            const subtitle = document.getElementById('hero-subtitle');
+            const title = document.getElementById('hero-title');
+            const desc = document.getElementById('hero-desc');
+            const statusText = document.getElementById('hero-status-text');
+            
+            const colors = colorMap[targetModule.color] || colorMap['indigo'];
+            
+            title.textContent = targetModule.title;
+            desc.textContent = `${targetPhase.phaseName} - ${targetPhase.grade} • ${targetModule.desc.substring(0, 45)}...`;
+            
+            if (!targetModule.isCompleted) {
+                subtitle.textContent = "LANJUTKAN BELAJAR";
+                subtitle.className = `text-xs font-semibold ${colors.text} uppercase tracking-widest mb-1.5 opacity-90`;
+                statusText.textContent = "Belum Selesai";
+                statusText.className = "text-amber-400 font-bold";
+            } else {
+                subtitle.textContent = "ULAS KEMBALI MATERI";
+                subtitle.className = `text-xs font-semibold ${colors.text} uppercase tracking-widest mb-1.5 opacity-90`;
+                statusText.textContent = "Selesai";
+                statusText.className = "text-emerald-400 font-bold";
+            }
+
+            iconWrap.className = `min-w-[4rem] w-16 h-16 rounded-[1.2rem] ${colors.bg} ${colors.border} border flex items-center justify-center ${colors.text} group-hover:scale-110 group-hover:rotate-3 transition-transform duration-500 shadow-[0_0_30px_rgba(255,255,255,0.05)] focus:outline-none`;
+            iconWrap.style.boxShadow = `0 0 30px var(--tw-shadow-color)`;
+            icon.setAttribute('data-lucide', targetModule.icon);
+
+            card.className = `relative bg-surface border border-borderGray rounded-[2rem] p-6 md:p-8 flex flex-col md:flex-row md:items-center justify-between gap-6 hover:shadow-card-hover group cursor-pointer transition-all focus:outline-none focus-visible:ring-4 focus-visible:ring-${colors.bar.replace('bg-','')}/50 overflow-hidden`;
+            card.onclick = (e) => simulateLoading(card, e, targetModule);
+            
+            if (window.lucide) {
+                lucide.createIcons({ root: document.getElementById('hero-card') });
+            }
+        }
+
+        function updateOnlineStatus() {
+            isOffline = !navigator.onLine;
+            if (isOffline) {
+                toastManager.show('offline-toast');
+            }
+        }
+
+        window.addEventListener('online', updateOnlineStatus);
+        window.addEventListener('offline', updateOnlineStatus);
+        updateOnlineStatus();
+
+        const modulePanel = document.getElementById('module-panel');
+        const panelBackdrop = document.getElementById('panel-backdrop');
+        
+        let touchStartX = 0;
+        let touchCurrentX = 0;
+        let isSwipingPanel = false;
+
+        modulePanel.addEventListener('touchstart', (e) => {
+            touchStartX = e.touches[0].clientX;
+            isSwipingPanel = true;
+            modulePanel.style.transition = 'none'; 
+        }, {passive: true});
+
+        modulePanel.addEventListener('touchmove', (e) => {
+            if (!isSwipingPanel) return;
+            touchCurrentX = e.touches[0].clientX;
+            const deltaX = touchCurrentX - touchStartX;
+            if (deltaX > 0) modulePanel.style.transform = `translateX(${deltaX}px)`;
+        }, {passive: true});
+
+        modulePanel.addEventListener('touchend', (e) => {
+            if (!isSwipingPanel) return;
+            isSwipingPanel = false;
+            modulePanel.style.transition = ''; 
+            const deltaX = touchCurrentX - touchStartX;
+            if (deltaX > 100) closeModulePanel();
+            else modulePanel.style.transform = 'translateX(0)';
+        });
+
+        let trapFocusListener = null;
+        function trapFocus(element) {
+            const focusableEls = element.querySelectorAll('a[href], button:not([disabled]), textarea, input[type="text"], input[type="radio"], input[type="checkbox"], select, [tabindex]:not([tabindex="-1"])');
+            if (focusableEls.length === 0) return;
+            
+            const firstFocusableEl = focusableEls[0];  
+            const lastFocusableEl = focusableEls[focusableEls.length - 1];
+
+            trapFocusListener = function(e) {
+                const isTabPressed = (e.key === 'Tab' || e.keyCode === 9);
+                if (!isTabPressed) return;
+
+                if (e.shiftKey) { 
+                    if (document.activeElement === firstFocusableEl) {
+                        lastFocusableEl.focus();
+                        e.preventDefault();
+                    }
+                } else { 
+                    if (document.activeElement === lastFocusableEl) {
+                        firstFocusableEl.focus();
+                        e.preventDefault();
+                    }
+                }
+            };
+            document.addEventListener('keydown', trapFocusListener);
+            setTimeout(() => firstFocusableEl.focus(), 100);
+        }
+
+        function removeTrapFocus() {
+            if (trapFocusListener) {
+                document.removeEventListener('keydown', trapFocusListener);
+                trapFocusListener = null;
+            }
+        }
+
+        function openModulePanel(moduleData) {
+            currentActiveModuleRef = moduleData;
+
+            document.getElementById('panel-title').textContent = moduleData.title;
+            document.getElementById('panel-desc').textContent = moduleData.desc;
+            
+            const iconWrap = document.getElementById('panel-icon-wrap');
+            const colors = colorMap[moduleData.color] || colorMap['indigo'];
+            
+            iconWrap.className = `w-28 h-28 rounded-[2rem] flex items-center justify-center mb-8 shadow-[0_0_40px_rgba(255,255,255,0.05)] border relative overflow-hidden ${colors.bg} ${colors.border} ${colors.text}`;
+            iconWrap.innerHTML = `<div class="absolute inset-0 bg-gradient-to-b from-white/10 to-transparent pointer-events-none"></div><i id="panel-icon" data-lucide="${moduleData.icon}" class="w-12 h-12 relative z-10"></i>`;
+            
+            const btnToggleText = document.getElementById('btn-toggle-text');
+            const btnToggleIcon = document.getElementById('btn-toggle-icon');
+            const btnToggle = document.getElementById('btn-toggle-done');
+            
+            if(moduleData.isCompleted) {
+                btnToggleText.textContent = "Batalkan Selesai";
+                btnToggleIcon.setAttribute('data-lucide', 'x-circle');
+                btnToggle.className = "w-full py-3.5 bg-rose-500/10 text-rose-400 font-medium rounded-2xl transition-all border border-rose-500/30 hover:border-rose-500/50 active:scale-[0.98] flex items-center justify-center gap-2 focus:outline-none focus-visible:ring-2 focus-visible:ring-rose-500";
+            } else {
+                btnToggleText.textContent = "Tandai Selesai";
+                btnToggleIcon.setAttribute('data-lucide', 'check-circle');
+                btnToggle.className = "w-full py-3.5 bg-transparent hover:bg-emerald-500/10 text-emerald-400 font-medium rounded-2xl transition-all border border-emerald-500/30 hover:border-emerald-500/50 active:scale-[0.98] flex items-center justify-center gap-2 focus:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500";
+            }
+
+            if (window.lucide) {
+                lucide.createIcons({ root: modulePanel });
+            }
+
+            panelBackdrop.classList.remove('opacity-0', 'pointer-events-none');
+            panelBackdrop.classList.add('opacity-100', 'pointer-events-auto');
+            modulePanel.style.transform = '';
+            modulePanel.classList.remove('translate-x-full');
+            modulePanel.classList.add('translate-x-0');
+            document.body.style.overflow = 'hidden';
+
+            trapFocus(modulePanel);
+        }
+
+        let lastClickedModuleCard = null;
+
+        function closeModulePanel() {
+            removeTrapFocus();
+            
+            panelBackdrop.classList.remove('opacity-100', 'pointer-events-auto');
+            panelBackdrop.classList.add('opacity-0', 'pointer-events-none');
+            
+            modulePanel.style.transform = ''; 
+            modulePanel.classList.remove('translate-x-0');
+            modulePanel.classList.add('translate-x-full');
+            
+            document.body.style.overflow = '';
+
+            setTimeout(() => {
+                if (lastClickedModuleCard) {
+                    lastClickedModuleCard.focus();
+                    lastClickedModuleCard.classList.add('ring-4', 'ring-indigo-500/50');
+                    setTimeout(() => lastClickedModuleCard.classList.remove('ring-4', 'ring-indigo-500/50'), 800);
+                }
+            }, 400); 
+        }
+
+        function simulateLoading(element, event, moduleData) {
+            if(event) event.stopPropagation();
+            if(element.classList.contains('is-loading')) return;
+
+            lastClickedModuleCard = element;
+
+            if (isOffline) {
+                element.classList.add('animate-pulse');
+                setTimeout(() => element.classList.remove('animate-pulse'), 500);
+                return;
+            }
+
+            const textSpans = element.querySelectorAll('.btn-text');
+            const spinner = element.querySelector('.btn-spinner');
+
+            if(textSpans.length > 0 && spinner) {
+                element.classList.add('is-loading', 'opacity-80', 'pointer-events-none');
+                textSpans.forEach(span => span.classList.add('hidden'));
+                spinner.classList.remove('hidden');
+
+                setTimeout(() => {
+                    element.classList.remove('is-loading', 'opacity-80', 'pointer-events-none');
+                    textSpans.forEach(span => span.classList.remove('hidden'));
+                    spinner.classList.add('hidden');
+                    openModulePanel(moduleData);
+                }, 700);
+            } else {
+                 openModulePanel(moduleData);
+            }
+        }
+
+        // SISTEM BENTO GRID / MOSAIC BARU (Disempurnakan) ===========================
+        function updateModuleCardDOM(mod) {
+            const card = document.getElementById(`mod-card-${mod.id}`);
+            if (!card) return;
+            const bottomSection = card.querySelector('.mod-bottom-section');
+            if (!bottomSection) return;
+
+            const isCompleted = mod.isCompleted;
+
+            card.onclick = (e) => simulateLoading(card, e, mod);
+
+            // Update Badge dengan aman menggunakan wrapper
+            const badgeWrappers = card.querySelectorAll('.badge-wrapper');
+            badgeWrappers.forEach(wrapper => {
+                wrapper.innerHTML = isCompleted ? `<span class="badge-selesai px-2.5 py-1 text-[10px] font-bold uppercase tracking-widest bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 rounded-lg backdrop-blur-sm shrink-0 whitespace-nowrap shadow-sm">Selesai</span>` : '';
+            });
+            
+            if (isCompleted) {
+                card.classList.add('opacity-75', 'hover:opacity-100');
+            } else {
+                card.classList.remove('opacity-75', 'hover:opacity-100');
+            }
+
+            // Ganti tombol bawah tanpa Progress Bar
+            let bottomHtml = '';
+            if (isCompleted) {
+                bottomHtml = `
+                    <div role="button" tabindex="0" class="w-full py-2.5 bg-emerald-500/10 hover:bg-emerald-500/20 flex items-center justify-center gap-2 text-emerald-400 text-sm font-semibold rounded-xl transition-all border border-emerald-500/20 active:scale-95 pointer-events-auto cursor-pointer backdrop-blur-sm">
+                        <i data-lucide="check-circle" class="w-4 h-4 btn-text"></i>
+                        <span class="btn-text">Diulas</span>
+                        <i data-lucide="loader-2" class="w-4 h-4 animate-spin hidden btn-spinner text-emerald-400"></i>
+                    </div>
+                `;
+            } else {
+                bottomHtml = `
+                    <div role="button" tabindex="0" class="w-full py-2.5 bg-white/5 hover:bg-white/10 flex items-center justify-center gap-2 text-white text-sm font-medium rounded-xl transition-all border border-white/5 active:scale-95 pointer-events-auto cursor-pointer backdrop-blur-sm">
+                        <i data-lucide="book-open" class="w-4 h-4 btn-text"></i>
+                        <span class="btn-text">Buka</span>
+                        <i data-lucide="loader-2" class="w-4 h-4 animate-spin hidden btn-spinner text-white"></i>
+                    </div>
+                `;
+            }
+            
+            bottomSection.innerHTML = bottomHtml;
+            if (window.lucide) {
+                lucide.createIcons({ root: bottomSection });
+            }
+        }
+
+        function toggleStatusSelesai() {
+            if(!currentActiveModuleRef || isOffline) return;
+
+            const btnText = document.getElementById('btn-toggle-text');
+            const btnIcon = document.getElementById('btn-toggle-icon');
+            const btnLoader = document.getElementById('btn-toggle-loader');
+            
+            btnText.classList.add('hidden');
+            btnIcon.classList.add('hidden');
+            btnLoader.classList.remove('hidden');
+
+            setTimeout(() => {
+                btnText.classList.remove('hidden');
+                btnIcon.classList.remove('hidden');
+                btnLoader.classList.add('hidden');
+
+                const isCurrentlyDone = currentActiveModuleRef.isCompleted;
+                const newStatus = !isCurrentlyDone;
+                
+                // Optimistic UI Update
+                const oldProgressMap = { ...userProgressMap };
+                let tempProgressMap = { ...userProgressMap };
+                tempProgressMap[currentActiveModuleRef.id] = newStatus;
+                
+                userProgressMap = tempProgressMap;
+                currentActiveModuleRef.isCompleted = newStatus;
+                
+                updateModuleCardDOM(currentActiveModuleRef);
+                updateHeroCard();
+                openModulePanel(currentActiveModuleRef);
+
+                if (setSafeData('dyerzdev_progress', tempProgressMap)) {
+                    document.querySelector('#progress-toast span').textContent = newStatus ? 'Modul ditandai selesai!' : 'Status selesai dibatalkan.';
+                    toastManager.show('progress-toast');
+                } else {
+                    userProgressMap = oldProgressMap;
+                    currentActiveModuleRef.isCompleted = isCurrentlyDone;
+                    updateModuleCardDOM(currentActiveModuleRef);
+                    updateHeroCard();
+                    openModulePanel(currentActiveModuleRef);
+                }
+                
+            }, 400); 
+        }
+
+        function renderSkeleton() {
+            const container = document.getElementById('curriculum-container');
+            container.innerHTML = `
+                <section class="pt-2 pb-8 animate-fade-in">
+                    <div class="mb-8">
+                        <div class="flex items-center gap-3 mb-2">
+                            <div class="h-8 md:h-10 w-32 bg-white/5 rounded-xl skeleton-shimmer"></div>
+                            <div class="h-6 w-24 bg-white/5 rounded-lg skeleton-shimmer"></div>
+                        </div>
+                        <div class="h-4 w-64 bg-white/5 rounded-md flex skeleton-shimmer"></div>
+                    </div>
+                    <div class="grid grid-cols-12 gap-4 md:gap-5">
+                        <!-- Horizontal Skeleton -->
+                        <div class="col-span-12 md:col-span-8 bg-surface border border-white/5 rounded-[1.5rem] p-6 flex flex-col md:flex-row gap-6 relative overflow-hidden">
+                             <div class="w-14 h-14 rounded-[1.2rem] bg-white/5 skeleton-shimmer shrink-0"></div>
+                             <div class="flex-1 space-y-3 justify-center flex flex-col">
+                                 <div class="h-6 w-3/4 bg-white/10 rounded-lg skeleton-shimmer"></div>
+                                 <div class="h-4 w-full bg-white/5 rounded-md skeleton-shimmer"></div>
+                                 <div class="h-4 w-2/3 bg-white/5 rounded-md skeleton-shimmer"></div>
+                             </div>
+                             <div class="shrink-0 w-full md:w-48 lg:w-56 flex flex-col justify-center border-t md:border-t-0 md:border-l border-white/5 pt-4 md:pt-0 pl-0 md:pl-6 mt-4 md:mt-0">
+                                 <div class="h-10 w-full bg-white/5 rounded-xl skeleton-shimmer"></div>
+                             </div>
+                        </div>
+                        <!-- Vertical Skeleton -->
+                        <div class="col-span-12 md:col-span-4 bg-surface border border-white/5 rounded-[1.5rem] p-6 flex flex-col relative overflow-hidden">
+                             <div class="w-12 h-12 rounded-[1.1rem] bg-white/5 skeleton-shimmer mb-4"></div>
+                             <div class="h-5 w-3/4 bg-white/10 rounded-lg skeleton-shimmer mb-3"></div>
+                             <div class="h-3 w-full bg-white/5 rounded-md skeleton-shimmer mb-4"></div>
+                             <div class="mt-auto pt-4 border-t border-white/5 shrink-0 w-full">
+                                 <div class="h-10 w-full bg-white/5 rounded-xl skeleton-shimmer"></div>
+                             </div>
+                        </div>
+                        <!-- Vertical Skeleton -->
+                        <div class="col-span-12 md:col-span-4 bg-surface border border-white/5 rounded-[1.5rem] p-6 flex flex-col relative overflow-hidden hidden md:flex">
+                             <div class="w-12 h-12 rounded-[1.1rem] bg-white/5 skeleton-shimmer mb-4"></div>
+                             <div class="h-5 w-3/4 bg-white/10 rounded-lg skeleton-shimmer mb-3"></div>
+                             <div class="h-3 w-full bg-white/5 rounded-md skeleton-shimmer mb-4"></div>
+                             <div class="mt-auto pt-4 border-t border-white/5 shrink-0 w-full">
+                                 <div class="h-10 w-full bg-white/5 rounded-xl skeleton-shimmer"></div>
+                             </div>
+                        </div>
+                         <!-- Vertical Skeleton -->
+                        <div class="col-span-12 md:col-span-4 bg-surface border border-white/5 rounded-[1.5rem] p-6 flex flex-col relative overflow-hidden hidden lg:flex">
+                             <div class="w-12 h-12 rounded-[1.1rem] bg-white/5 skeleton-shimmer mb-4"></div>
+                             <div class="h-5 w-3/4 bg-white/10 rounded-lg skeleton-shimmer mb-3"></div>
+                             <div class="h-3 w-full bg-white/5 rounded-md skeleton-shimmer mb-4"></div>
+                             <div class="mt-auto pt-4 border-t border-white/5 shrink-0 w-full">
+                                 <div class="h-10 w-full bg-white/5 rounded-xl skeleton-shimmer"></div>
+                             </div>
+                        </div>
+                    </div>
+                </section>
+            `;
+        }
+
+        function generateModuleCardHTML(mod, index) {
+            const colors = colorMap[mod.color] || colorMap['indigo'];
+            const isCompleted = mod.isCompleted;
+            
+            let bottomSectionHtml = '';
+            if (isCompleted) {
+                bottomSectionHtml = `
+                    <div role="button" tabindex="0" class="w-full py-2.5 bg-emerald-500/10 hover:bg-emerald-500/20 flex items-center justify-center gap-2 text-emerald-400 text-sm font-semibold rounded-xl transition-all border border-emerald-500/20 active:scale-95 pointer-events-auto cursor-pointer backdrop-blur-sm">
+                        <i data-lucide="check-circle" class="w-4 h-4 btn-text"></i>
+                        <span class="btn-text">Diulas</span>
+                        <i data-lucide="loader-2" class="w-4 h-4 animate-spin hidden btn-spinner text-emerald-400"></i>
+                    </div>
+                `;
+            } else {
+                bottomSectionHtml = `
+                    <div role="button" tabindex="0" class="w-full py-2.5 bg-white/5 hover:bg-white/10 flex items-center justify-center gap-2 text-white text-sm font-medium rounded-xl transition-all border border-white/5 active:scale-95 pointer-events-auto cursor-pointer backdrop-blur-sm">
+                        <i data-lucide="book-open" class="w-4 h-4 btn-text"></i>
+                        <span class="btn-text">Buka</span>
+                        <i data-lucide="loader-2" class="w-4 h-4 animate-spin hidden btn-spinner text-white"></i>
+                    </div>
+                `;
+            }
+
+            const completedClass = isCompleted ? 'opacity-75 hover:opacity-100' : '';
+            const badgeHtml = isCompleted ? `<span class="badge-selesai px-2.5 py-1 text-[10px] font-bold uppercase tracking-widest bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 rounded-lg backdrop-blur-sm shrink-0 whitespace-nowrap shadow-sm">Selesai</span>` : '';
+
+            // Algoritma Grid Pola Bento yang menghasilkan layout unik dan rapi!
+            const pattern = [
+                { span: 'col-span-12 md:col-span-8 lg:col-span-8', layout: 'horizontal' }, // 0
+                { span: 'col-span-12 md:col-span-4 lg:col-span-4', layout: 'vertical' },   // 1
+                { span: 'col-span-12 md:col-span-4 lg:col-span-4', layout: 'vertical' },   // 2
+                { span: 'col-span-12 md:col-span-4 lg:col-span-4', layout: 'vertical' },   // 3
+                { span: 'col-span-12 md:col-span-4 lg:col-span-4', layout: 'vertical' },   // 4
+                { span: 'col-span-12 md:col-span-6 lg:col-span-6', layout: 'horizontal-sm' }, // 5
+                { span: 'col-span-12 md:col-span-6 lg:col-span-6', layout: 'horizontal-sm' }, // 6
+                { span: 'col-span-12', layout: 'horizontal-wide' } // 7
+            ];
+            
+            const config = pattern[index % 8];
+            const spanClass = config.span;
+            let innerHtml = '';
+
+            const baseCardWrapperStart = `
+                <div id="mod-card-${mod.id}" data-search-text="${mod.title.toLowerCase()} ${mod.desc.toLowerCase()}" tabindex="0" role="button" onkeydown="if(event.key==='Enter' || event.key===' ') { event.preventDefault(); this.click(); }" onclick="simulateLoading(this, event, ${JSON.stringify(mod).replace(/"/g, '&quot;')})" class="module-wrapper module-card bg-surface border border-borderGray hover:border-white/10 rounded-[1.5rem] p-5 md:p-6 flex flex-col cursor-pointer group relative overflow-hidden active:scale-[0.98] focus:outline-none focus-visible:ring-4 focus-visible:ring-${colors.bar.replace('bg-', '')}/50 transition-all duration-400 shadow-sm hover:shadow-xl hover:-translate-y-1 ${completedClass} ${spanClass}">
+                    <div class="absolute inset-0 bg-gradient-to-br from-${colors.bar.replace('bg-', '')}/[0.03] to-transparent opacity-100 group-hover:opacity-0 transition-opacity duration-500 pointer-events-none"></div>
+                    <div class="absolute -inset-32 bg-gradient-to-tr from-${colors.bar.replace('bg-', '')}/0 via-${colors.bar.replace('bg-', '')}/[0.08] to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none blur-2xl"></div>
+            `;
+            const baseCardWrapperEnd = `</div>`;
+
+            // STRUKTUR FLEXBOX YANG DIROBAK: Memisahkan (Header+Teks) dengan Tombol secara ketat menggunakan mt-auto dan shrink-0.
+            if (config.layout === 'vertical') {
+                innerHtml = `
+                    <div class="relative z-10 flex flex-col w-full h-full">
+                        <div class="mod-header-section flex justify-between items-start mb-4 shrink-0">
+                            <div class="w-12 h-12 rounded-[1.1rem] ${colors.bg} ${colors.border} border flex items-center justify-center ${colors.text} transition-all duration-500 group-hover:scale-110 group-hover:-rotate-3 shadow-md">
+                                <i data-lucide="${mod.icon}" class="w-6 h-6"></i>
+                            </div>
+                            <div class="badge-wrapper">${badgeHtml}</div>
+                        </div>
+                        <div class="flex-1 flex flex-col mb-5">
+                            <h3 class="text-white font-semibold text-lg mb-2 group-hover:text-indigo-100 transition-colors tracking-tight line-clamp-2">${mod.title}</h3>
+                            <p class="text-zinc-400 text-sm line-clamp-3 leading-relaxed font-normal">${mod.desc}</p>
+                        </div>
+                        <div class="mod-bottom-section mt-auto pt-4 border-t border-white/5 shrink-0 w-full flex items-center">
+                            ${bottomSectionHtml}
+                        </div>
+                    </div>
+                `;
+            } else if (config.layout === 'horizontal') {
+                innerHtml = `
+                    <div class="relative z-10 flex flex-col md:flex-row w-full h-full gap-5 md:gap-6">
+                        <div class="flex-1 flex flex-col md:flex-row gap-4 md:gap-5 items-start md:items-center w-full">
+                            <div class="mod-header-section flex justify-between items-center w-full md:w-auto shrink-0">
+                                <div class="w-14 h-14 rounded-[1.2rem] ${colors.bg} ${colors.border} border flex items-center justify-center ${colors.text} transition-all duration-500 group-hover:scale-110 group-hover:-rotate-3 shadow-lg">
+                                    <i data-lucide="${mod.icon}" class="w-7 h-7"></i>
+                                </div>
+                                <!-- Badge khusus Mobile jika tidak muat di judul -->
+                                <div class="badge-wrapper md:hidden">${badgeHtml}</div>
+                            </div>
+                            <div class="flex-1 min-w-0 w-full flex flex-col justify-center">
+                                <div class="flex items-center gap-3 mb-1.5">
+                                    <h3 class="text-white font-bold text-xl group-hover:text-indigo-100 transition-colors tracking-tight line-clamp-2">${mod.title}</h3>
+                                    <div class="badge-wrapper hidden md:block">${badgeHtml}</div>
+                                </div>
+                                <p class="text-zinc-400 text-sm md:text-base line-clamp-2 leading-relaxed font-normal">${mod.desc}</p>
+                            </div>
+                        </div>
+                        <div class="mod-bottom-section shrink-0 w-full md:w-48 lg:w-56 flex flex-col justify-center border-t md:border-t-0 md:border-l border-white/5 pt-4 md:pt-0 pl-0 md:pl-6 mt-auto md:mt-0">
+                            ${bottomSectionHtml}
+                        </div>
+                    </div>
+                `;
+            } else if (config.layout === 'horizontal-sm') {
+                innerHtml = `
+                    <div class="relative z-10 flex flex-col sm:flex-row w-full h-full gap-4 sm:gap-5">
+                        <div class="flex-1 flex flex-col sm:flex-row gap-4 sm:gap-4 items-start sm:items-center w-full">
+                            <div class="mod-header-section flex justify-between items-center w-full sm:w-auto shrink-0">
+                                <div class="w-12 h-12 rounded-[1.1rem] ${colors.bg} ${colors.border} border flex items-center justify-center ${colors.text} transition-all duration-500 group-hover:scale-110 group-hover:-rotate-3 shadow-md">
+                                    <i data-lucide="${mod.icon}" class="w-6 h-6"></i>
+                                </div>
+                                <div class="badge-wrapper sm:hidden">${badgeHtml}</div>
+                            </div>
+                            <div class="flex-1 min-w-0 w-full flex flex-col justify-center">
+                                <div class="flex items-center gap-3 mb-1.5">
+                                    <h3 class="text-white font-semibold text-lg group-hover:text-indigo-100 transition-colors tracking-tight line-clamp-2">${mod.title}</h3>
+                                    <div class="badge-wrapper hidden sm:block">${badgeHtml}</div>
+                                </div>
+                                <p class="text-zinc-400 text-sm line-clamp-2 leading-relaxed font-normal">${mod.desc}</p>
+                            </div>
+                        </div>
+                        <div class="mod-bottom-section shrink-0 w-full sm:w-40 flex flex-col justify-center border-t sm:border-t-0 sm:border-l border-white/5 pt-4 sm:pt-0 pl-0 sm:pl-5 mt-auto sm:mt-0">
+                            ${bottomSectionHtml}
+                        </div>
+                    </div>
+                `;
+            } else if (config.layout === 'horizontal-wide') {
+                innerHtml = `
+                    <div class="relative z-10 flex flex-col md:flex-row w-full h-full gap-4 md:gap-6">
+                        <div class="flex-1 flex flex-col md:flex-row gap-4 md:gap-6 items-start md:items-center w-full">
+                            <div class="mod-header-section flex justify-between items-center w-full md:w-auto shrink-0">
+                                <div class="w-12 h-12 md:w-14 md:h-14 rounded-[1.1rem] ${colors.bg} ${colors.border} border flex items-center justify-center ${colors.text} transition-all duration-500 group-hover:scale-110 group-hover:-rotate-3 shadow-lg">
+                                    <i data-lucide="${mod.icon}" class="w-6 h-6 md:w-7 md:h-7"></i>
+                                </div>
+                                <div class="badge-wrapper md:hidden">${badgeHtml}</div>
+                            </div>
+                            <div class="flex-1 min-w-0 w-full flex flex-col justify-center">
+                                <div class="flex items-center gap-3 mb-1.5">
+                                    <h3 class="text-white font-bold text-lg md:text-xl group-hover:text-indigo-100 transition-colors tracking-tight line-clamp-1">${mod.title}</h3>
+                                    <div class="badge-wrapper hidden md:block">${badgeHtml}</div>
+                                </div>
+                                <p class="text-zinc-400 text-sm line-clamp-2 leading-relaxed font-normal">${mod.desc}</p>
+                            </div>
+                        </div>
+                        <div class="mod-bottom-section shrink-0 w-full md:w-56 lg:w-64 flex flex-col justify-center border-t md:border-t-0 md:border-l border-white/5 pt-4 md:pt-0 pl-0 md:pl-6 mt-auto md:mt-0">
+                            ${bottomSectionHtml}
+                        </div>
+                    </div>
+                `;
+            }
+
+            return baseCardWrapperStart + innerHtml + baseCardWrapperEnd;
+        }
+
+        function buildCurriculumDOM() {
+            const container = document.getElementById('curriculum-container');
+            container.innerHTML = '';
+            
+            const fragment = document.createDocumentFragment();
+            
+            curriculumData.forEach((phase, index) => {
+                const section = document.createElement('section');
+                section.id = phase.phaseId;
+                section.className = `scroll-mt-32 phase-section ${index !== 0 ? 'pt-10 md:pt-14 border-t border-white/5 mt-10' : ''}`;
+                
+                // Meneruskan index loop (modIndex) agar Bento Grid tahu polanya!
+                const modulesHTML = phase.modules.map((mod, modIndex) => generateModuleCardHTML(mod, modIndex)).join('');
+
+                section.innerHTML = `
+                    <div class="mb-6 md:mb-8 phase-header">
+                        <h2 class="text-2xl md:text-3xl font-bold text-white flex items-center gap-3 tracking-tight">
+                            ${phase.phaseName} 
+                            <span class="px-3 py-1 bg-white/5 border border-white/10 text-sm font-medium text-zinc-300 rounded-full align-middle backdrop-blur-md">${phase.grade}</span>
+                        </h2>
+                        <p class="text-zinc-400 text-sm md:text-base mt-2 leading-relaxed">${phase.description}</p>
+                    </div>
+                    <!-- Penggunaan 12 Kolom CSS Grid yang Kuat dan Fleksibel -->
+                    <div class="grid grid-cols-12 gap-4 md:gap-5 items-stretch phase-grid">
+                        ${modulesHTML}
+                    </div>
+                `;
+                fragment.appendChild(section);
+            });
+
+            container.appendChild(fragment);
+
+            if (window.lucide) {
+                lucide.createIcons({ root: container });
+            }
+            setupScrollSpy();
+
+            requestAnimationFrame(() => {
+                if (sessionStorage) {
+                    const savedScroll = sessionStorage.getItem('dyerzdev_scroll_index');
+                    if (savedScroll) {
+                        scrollArea.scrollTo({ top: parseInt(savedScroll, 10), behavior: 'instant' });
+                    }
+                }
+            });
+        }
+
+        function fuzzySearchMatch(query, text) {
+            query = query.toLowerCase().trim();
+            text = text.toLowerCase().trim();
+            if (text.includes(query)) return true;
+
+            const levenshtein = (a, b) => {
+                const matrix = Array.from({ length: a.length + 1 }, (_, i) => [i]);
+                for (let j = 0; j <= b.length; j++) matrix[0][j] = j;
+                for (let i = 1; i <= a.length; i++) {
+                    for (let j = 1; j <= b.length; j++) {
+                        matrix[i][j] = b.charAt(j - 1) === a.charAt(i - 1) ? matrix[i - 1][j - 1] :
+                            Math.min(matrix[i - 1][j - 1] + 1, matrix[i][j - 1] + 1, matrix[i - 1][j] + 1);
+                    }
+                }
+                return matrix[a.length][b.length];
+            };
+
+            const queryWords = query.split(/\s+/);
+            const textWords = text.split(/[\s,.-]+/);
+            return queryWords.every(qw => {
+                return textWords.some(tw => {
+                    if (qw.length <= 2) return tw === qw;
+                    if (tw.includes(qw)) return true;
+                    return levenshtein(qw, tw) <= Math.floor(qw.length / 3);
+                });
+            });
+        }
+
+        function filterCurriculumDOM(keyword) {
+            const emptyState = document.getElementById('search-empty-state');
+            const keywordDisplay = document.getElementById('keyword-display');
+            const curriculumContainer = document.getElementById('curriculum-container');
+            let hasGlobalResults = false;
+
+            if (keyword.trim() === '') {
+                document.querySelectorAll('.phase-section, .module-wrapper').forEach(el => el.classList.remove('hidden'));
+                curriculumContainer.classList.remove('hidden');
+            } else {
+                curriculumContainer.classList.remove('hidden');
+                const sections = document.querySelectorAll('.phase-section');
+                
+                sections.forEach(section => {
+                    const cards = section.querySelectorAll('.module-wrapper');
+                    let hasSectionResults = false;
+
+                    cards.forEach(card => {
+                        const text = card.getAttribute('data-search-text');
+                        if (fuzzySearchMatch(keyword, text)) {
+                            card.classList.remove('hidden');
+                            hasSectionResults = true;
+                            hasGlobalResults = true;
+                        } else {
+                            card.classList.add('hidden');
+                        }
+                    });
+
+                    if (hasSectionResults) {
+                        section.classList.remove('hidden');
+                    } else {
+                        section.classList.add('hidden');
+                    }
+                });
+            }
+
+            if (!hasGlobalResults && keyword.trim() !== '') {
+                emptyState.classList.remove('hidden');
+                emptyState.classList.add('flex');
+                keywordDisplay.textContent = keyword;
+                curriculumContainer.classList.add('hidden'); // Menyembunyikan 300px min-height penampung agar empty-state meluncur ke atas
+            } else {
+                emptyState.classList.add('hidden');
+                emptyState.classList.remove('flex');
+                curriculumContainer.classList.remove('hidden');
+            }
+        }
+
+        updateHeroCard();
+        renderSkeleton();
+        setTimeout(() => {
+            buildCurriculumDOM();
+        }, 600);
+
+        const searchInput = document.getElementById('search-input');
+        const mainHeader = document.getElementById('main-header');
+        const searchClearBtn = document.getElementById('search-clear-btn');
+        const btnResetSearch = document.getElementById('btn-reset-search');
+        const bottomNavWrapper = document.getElementById('bottom-nav-wrapper');
+        const searchOverlay = document.getElementById('search-overlay');
+        
+        searchInput.addEventListener('focus', () => {
+            bottomNavWrapper.classList.add('nav-keyboard-hidden', 'opacity-0', 'pointer-events-none');
+            if (searchInput.value.trim() === '') {
+                searchOverlay.classList.remove('opacity-0', 'pointer-events-none');
+                searchOverlay.classList.add('opacity-100', 'pointer-events-auto');
+            }
+            if(window.innerWidth < 768) mainHeader.classList.add('header-search-active');
+        });
+
+        searchInput.addEventListener('blur', () => {
+            searchOverlay.classList.add('opacity-0', 'pointer-events-none');
+            searchOverlay.classList.remove('opacity-100', 'pointer-events-auto');
+            setTimeout(() => {
+                bottomNavWrapper.classList.remove('nav-keyboard-hidden', 'opacity-0', 'pointer-events-none');
+                if(searchInput.value === '') mainHeader.classList.remove('header-search-active');
+            }, 150); 
+        });
+
+        const debouncedSearch = debounce((val) => {
+            filterCurriculumDOM(val); 
+            if (val !== '') {
+                document.getElementById('scroll-area').scrollTo({ top: 0, behavior: 'smooth' });
+            }
+        }, 200); 
+        
+        window.addEventListener('keydown', (e) => {
+            if ((e.ctrlKey || e.metaKey) && e.key === 'k') { e.preventDefault(); searchInput.focus(); }
+        });
+
+        searchInput.addEventListener('input', (e) => {
+            const val = e.target.value;
+            if(val.length > 0) {
+                searchClearBtn.classList.remove('hidden');
+                searchOverlay.classList.add('opacity-0', 'pointer-events-none');
+                searchOverlay.classList.remove('opacity-100', 'pointer-events-auto');
+            } else {
+                searchClearBtn.classList.add('hidden');
+                searchOverlay.classList.remove('opacity-0', 'pointer-events-none');
+                searchOverlay.classList.add('opacity-100', 'pointer-events-auto');
+            }
+            debouncedSearch(val);
+        });
+
+        searchClearBtn.addEventListener('click', () => {
+            searchInput.value = '';
+            searchClearBtn.classList.add('hidden');
+            filterCurriculumDOM('');
+            searchInput.focus(); 
+        });
+
+        function resetAndScrollTop() {
+            searchInput.value = '';
+            searchClearBtn.classList.add('hidden');
+            searchInput.blur(); 
+            mainHeader.classList.remove('header-search-active');
+            searchOverlay.classList.add('opacity-0', 'pointer-events-none');
+            searchOverlay.classList.remove('opacity-100', 'pointer-events-auto');
+            filterCurriculumDOM('');
+            document.getElementById('scroll-area').scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        btnResetSearch.addEventListener('click', resetAndScrollTop);
+
+        function setSearchQuery(query) {
+            searchInput.value = query;
+            searchClearBtn.classList.remove('hidden');
+            mainHeader.classList.add('header-search-active');
+            searchOverlay.classList.add('opacity-0', 'pointer-events-none');
+            filterCurriculumDOM(query); 
+        }
+
+        const bottomNav = document.getElementById('bottom-nav');
+        let isDown = false; let startX; let scrollLeft; let isDragging = false;
+
+        bottomNav.addEventListener('mousedown', (e) => {
+            isDown = true; isDragging = false;
+            bottomNav.classList.add('nav-scroll-grabbing');
+            startX = e.pageX - bottomNav.offsetLeft;
+            scrollLeft = bottomNav.scrollLeft;
+        });
+        bottomNav.addEventListener('mouseleave', () => { isDown = false; bottomNav.classList.remove('nav-scroll-grabbing'); });
+        bottomNav.addEventListener('mouseup', () => { isDown = false; bottomNav.classList.remove('nav-scroll-grabbing'); });
+        bottomNav.addEventListener('mousemove', (e) => {
+            if (!isDown) return;
+            e.preventDefault();
+            const x = e.pageX - bottomNav.offsetLeft;
+            const walk = (x - startX) * 2; 
+            if (Math.abs(walk) > 3) isDragging = true;
+            bottomNav.scrollLeft = scrollLeft - walk;
+        });
+
+        document.querySelectorAll('.main-nav-item').forEach(link => {
+            link.addEventListener('click', (e) => { 
+                if(isDragging) { e.preventDefault(); e.stopPropagation(); } 
+            });
+        });
+
+        document.querySelectorAll('.nav-fase-link').forEach(link => {
+            link.addEventListener('click', (e) => { 
+                if(isDragging) { e.preventDefault(); e.stopPropagation(); return; }
+                
+                e.preventDefault(); 
+                
+                const targetId = link.getAttribute('href').substring(1);
+                const targetElement = document.getElementById(targetId);
+                const scrollArea = document.getElementById('scroll-area');
+                
+                if (targetElement && scrollArea) {
+                    const areaRect = scrollArea.getBoundingClientRect();
+                    const targetRect = targetElement.getBoundingClientRect();
+                    const exactTopPos = targetRect.top - areaRect.top + scrollArea.scrollTop;
+
+                    scrollArea.scrollTo({
+                        top: exactTopPos - 30,
+                        behavior: 'smooth'
+                    });
+                }
+            });
+        });
+
+        let scrollObserver = null;
+        function setupScrollSpy() {
+            if (scrollObserver) scrollObserver.disconnect();
+            const sections = document.querySelectorAll('.phase-section');
+            const navLinks = document.querySelectorAll('.nav-fase-link');
+            const options = { root: document.getElementById('scroll-area'), rootMargin: '-30% 0px -60% 0px', threshold: 0 };
+
+            scrollObserver = new IntersectionObserver((entries) => {
+                if (searchInput.value.trim() !== '') return;
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        const activeId = entry.target.id;
+                        navLinks.forEach(link => {
+                            const dot = link.querySelector('.nav-dot');
+                            const targetHref = link.getAttribute('href').substring(1);
+                            if (targetHref === activeId) {
+                                link.classList.add('bg-white/10');
+                                if(dot) dot.classList.add('scale-[1.5]', 'shadow-lg');
+                            } else {
+                                link.classList.remove('bg-white/10');
+                                if(dot) dot.classList.remove('scale-[1.5]', 'shadow-lg');
+                            }
+                        });
+                    }
+                });
+            }, options);
+
+            sections.forEach(section => scrollObserver.observe(section));
+        }
+        
+    </script>
+</body>
+</html>
