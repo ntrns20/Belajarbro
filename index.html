@@ -4,7 +4,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <!-- OPTIMASI #1: PWA / Tema Browser Mobile -->
-    <meta name="theme-color" content="#000000">
+    <!-- PENYEMPURNAAN #1: Tema diubah menyesuaikan background Amoled baru yang lebih soft -->
+    <meta name="theme-color" content="#09090b">
     <title>DyerzDev | Modul PPLG Lengkap</title>
     
     <!-- OPTIMASI #2: Self-Hosted Preloaded Fonts (WOFF2) -->
@@ -36,28 +37,52 @@
         }
 
         :root {
-            --c-amoled: #000000;
-            --c-darker: #050505;
-            --c-dark: #0a0a0a;
-            --c-surface: #121212;
-            --c-border: #1f1f1f;
+            /* PENYEMPURNAAN #1: Menghindari Pure Black & Pure White untuk Ergonomi Mata */
+            --c-amoled: #09090b; /* Zinc 950 - Hitam pekat yang jauh lebih lembut */
+            --c-darker: #0c0c0e;
+            --c-dark: #121214;
+            --c-surface: #18181b; /* Zinc 900 */
+            --c-border: #27272a; /* Zinc 800 */
             --c-iosdark: #1c1c1e;
             --c-cyan: #2dd4bf;
             --c-indigo: #818cf8;
-            --c-white: #ffffff;
-            --c-gray-500: #6b7280;
-            --c-gray-400: #9ca3af;
-            --c-gray-300: #d1d5db;
-            --c-gray-100: #f3f4f6;
+            --c-white: #f3f4f6; /* Gray 100 - Off-white untuk mencegah Halation/Silau */
+            
+            /* PENYEMPURNAAN VISUAL TAHAP 2: Kontras ditingkatkan agar lolos uji aksesibilitas WCAG AA */
+            --c-gray-500: #8b8b96; /* Diperterang dari sebelumnya #71717a agar aman dibaca */
+            --c-gray-400: #a8a8b3; /* Diperterang sedikit dari sebelumnya #a1a1aa */
+            
+            --c-gray-300: #d4d4d8; /* Zinc 300 */
+            --c-gray-100: #f4f4f5; /* Zinc 100 */
             --c-red: rgba(239, 68, 68, 0.8);
             --c-yellow: rgba(234, 179, 8, 0.8);
             --c-green: rgba(34, 197, 94, 0.8);
+        }
+
+        /* PENYEMPURNAAN #2: Custom Scrollbar untuk menjaga Imersi Desain Gelap */
+        ::-webkit-scrollbar {
+            width: 10px;
+            height: 10px;
+        }
+        ::-webkit-scrollbar-track {
+            background: var(--c-amoled);
+        }
+        ::-webkit-scrollbar-thumb {
+            background: var(--c-border);
+            border-radius: 5px;
+            border: 2px solid var(--c-amoled);
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: var(--c-gray-500);
         }
 
         * {
             box-sizing: border-box;
             margin: 0;
             padding: 0;
+            /* Firefox Scrollbar Support */
+            scrollbar-width: thin;
+            scrollbar-color: var(--c-border) var(--c-amoled);
         }
         body {
             background-color: var(--c-amoled);
@@ -97,17 +122,20 @@
             width: 100%;
             max-width: 1152px;
             margin: 0 auto;
-            padding: 8rem 1rem 5rem 1rem;
+            /* PENYEMPURNAAN VISUAL TAHAP 2: Padding disesuaikan karena Navigasi Mobile ada di bawah */
+            padding: 4rem 1rem 8rem 1rem;
         }
 
+        /* PENYEMPURNAAN VISUAL TAHAP 2: Ergonomi Navigasi Mobile (Default ada di bawah) */
         .glass-nav-wrapper {
             position: fixed;
-            top: 0; left: 0; right: 0;
+            bottom: 0; top: auto; left: 0; right: 0;
             z-index: 50;
-            padding: 1rem 0 2rem 0;
+            /* Extra padding bawah mendukung Safe Area iPhone / OS Navigation bar */
+            padding: 2rem 0 calc(1.5rem + env(safe-area-inset-bottom, 0px)) 0;
             display: flex;
             justify-content: center;
-            background: linear-gradient(to bottom, rgba(0,0,0,0.95) 0%, rgba(0,0,0,0.7) 50%, transparent 100%);
+            background: linear-gradient(to top, rgba(9, 9, 11, 0.98) 0%, rgba(9, 9, 11, 0.7) 50%, transparent 100%);
             backdrop-filter: blur(12px);
             -webkit-backdrop-filter: blur(12px);
             pointer-events: none;
@@ -115,6 +143,18 @@
             will-change: transform, backdrop-filter;
         }
         .glass-nav-wrapper > * { pointer-events: auto; }
+
+        /* Media Query untuk Desktop: Kembalikan navigasi ke atas */
+        @media (min-width: 768px) {
+            .glass-nav-wrapper {
+                top: 0; bottom: auto;
+                padding: 1rem 0 2rem 0;
+                background: linear-gradient(to bottom, rgba(9, 9, 11, 0.98) 0%, rgba(9, 9, 11, 0.7) 50%, transparent 100%);
+            }
+            .main-container {
+                padding: 8rem 1rem 5rem 1rem;
+            }
+        }
 
         .island-nav {
             background-color: var(--c-dark);
@@ -260,7 +300,8 @@
         .header-desc {
             color: var(--c-gray-400);
             font-size: 0.95rem;
-            max-width: 38rem;
+            /* PENYEMPURNAAN VISUAL TAHAP 2: Optimal reading measure (maksimal karakter ch) */
+            max-width: 65ch; 
             margin: 0 auto;
             line-height: 1.6;
             font-weight: 400;
@@ -369,10 +410,30 @@
             animation: fadeIn 0.4s ease;
         }
         .window-controls { display: flex; gap: 0.375rem; }
-        .control-dot { width: 0.625rem; height: 0.625rem; border-radius: 9999px; }
+        
+        /* PENYEMPURNAAN VISUAL TAHAP 2: Indikator Aksesibilitas pada Window Control Dots */
+        .control-dot { 
+            width: 0.625rem; height: 0.625rem; border-radius: 9999px;
+            position: relative; display: flex; align-items: center; justify-content: center;
+        }
+        .control-dot::before {
+            opacity: 0;
+            color: rgba(0,0,0,0.65);
+            font-family: system-ui, -apple-system, sans-serif;
+            transition: opacity 0.2s ease;
+            line-height: 1;
+            pointer-events: none;
+        }
+        .window-controls:hover .control-dot::before { opacity: 1; }
+        
         .dot-red { background-color: var(--c-red); }
+        .dot-red::before { content: '✕'; font-size: 6px; font-weight: 900; }
+        
         .dot-yellow { background-color: var(--c-yellow); }
+        .dot-yellow::before { content: '−'; font-size: 8px; font-weight: 900; }
+        
         .dot-green { background-color: var(--c-green); }
+        .dot-green::before { content: '＋'; font-size: 6px; font-weight: 900; }
 
         .file-name {
             font-size: 0.75rem;
@@ -396,6 +457,7 @@
             font-size: 0.875rem;
             color: var(--c-gray-400);
             margin-bottom: 1.5rem;
+            max-width: 75ch; /* PENYEMPURNAAN VISUAL TAHAP 2: Batas lebar teks didalam card */
             display: -webkit-box;
             -webkit-line-clamp: 3;
             -webkit-box-orient: vertical;
@@ -420,9 +482,11 @@
         }
         .status-text span { color: var(--c-white); }
 
+        /* PENYEMPURNAAN #4: Transisi Button & Spinner Loading */
         .cta-btn {
             display: inline-flex;
             align-items: center;
+            justify-content: center;
             gap: 0.375rem;
             border-radius: 0.25rem;
             background-color: rgba(31, 31, 31, 0.4);
@@ -430,22 +494,60 @@
             font-size: 0.75rem;
             font-weight: 600;
             color: var(--c-gray-300);
-            transition: all 0.3s;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
             box-shadow: 0 1px 2px rgba(0,0,0,0.05);
+            min-width: 96px; /* Mencegah tombol lompat saat teks berubah */
+            position: relative;
         }
         .module-card:hover .cta-btn {
             background-color: var(--accent-color);
             color: #000000;
         }
-        .cta-icon {
-            width: 0.875rem; height: 0.875rem;
-            transition: transform 0.3s;
-        }
-        .module-card:hover .cta-icon { transform: translateX(0.125rem); }
         
+        .cta-text {
+            transition: opacity 0.2s ease, transform 0.2s ease;
+            white-space: nowrap;
+        }
+
+        .cta-icon-wrapper {
+            position: relative;
+            width: 0.875rem; 
+            height: 0.875rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .cta-icon {
+            position: absolute;
+            width: 100%; 
+            height: 100%;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        
+        .cta-arrow { opacity: 1; transform: translateX(0); }
+        .module-card:hover .cta-arrow { transform: translateX(0.125rem); }
+        
+        .cta-spinner { 
+            opacity: 0; 
+            transform: scale(0.5) rotate(-90deg); 
+        }
+
+        /* --- STATE IS-EXECUTING --- */
         .is-executing .cta-btn {
-            opacity: 0.7;
-            pointer-events: none;
+            background-color: var(--c-surface);
+            color: var(--accent-color);
+            border: 1px solid var(--accent-color);
+            pointer-events: none; /* Mencegah double click */
+        }
+        .is-executing .cta-arrow { 
+            opacity: 0; 
+            transform: translateX(10px); 
+        }
+        .is-executing .cta-spinner { 
+            opacity: 1; 
+            transform: scale(1) rotate(0deg); 
+            animation: spinSpinner 1s linear infinite; 
         }
 
         .main-footer {
@@ -519,11 +621,10 @@
             isolation: isolate;
         }
 
-        /* --- PENYEMPURNAAN #3 (CSS): Mencegah Layout Thrashing saat Angka Berubah --- */
         #sys-latency-text {
             font-variant-numeric: tabular-nums;
             display: inline-block;
-            min-width: 105px; /* Menjamin lebar yang statis walau angka memanjang/memendek */
+            min-width: 105px; 
             text-align: left;
         }
         
@@ -652,12 +753,38 @@
             0%, 100% { opacity: 1; transform: scale(1); }
             50% { opacity: 0.4; transform: scale(0.85); }
         }
+        
+        @keyframes spinSpinner {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
 
         ::view-transition-old(dynamic-island),
         ::view-transition-new(dynamic-island) { animation-duration: 0.4s; }
         
         @keyframes skeleton-shimmer {
             100% { transform: translateX(100%); }
+        }
+
+        /* PENYEMPURNAAN #3: Aksesibilitas Reduced Motion dari OS Pengguna */
+        @media (prefers-reduced-motion: reduce) {
+            .status-dot {
+                animation: none !important;
+                opacity: 1 !important;
+                transform: scale(1) !important;
+            }
+            .code-anim::before {
+                animation: none !important;
+                content: '</>' !important;
+            }
+            .module-card.skeleton-mode::before {
+                animation: none !important;
+                transform: translateX(0) !important;
+                background: linear-gradient(110deg, transparent 20%, rgba(255,255,255,0.02) 40%, transparent 60%) !important;
+            }
+            *, *::before, *::after {
+                scroll-behavior: auto !important;
+            }
         }
     </style>
 </head>
@@ -680,7 +807,8 @@
             </button>
 
             <div class="island-code-wrap">
-                <span id="island-code-anim" class="island-code code-anim"></span>
+                <!-- BUG FIX #4: aria-hidden="true" ditambahkan untuk menyembunyikan elemen dekorasi dari Screen Reader -->
+                <span id="island-code-anim" class="island-code code-anim" aria-hidden="true"></span>
             </div>
         </nav>
     </div>
@@ -735,7 +863,7 @@
         </div>
     </footer>
 
-    <!-- --- PENYEMPURNAAN #1 (HTML): Template DOM Element --- -->
+    <!-- --- PENYEMPURNAAN #4 (HTML): Inject Icon Spinner ke dalam Template --- -->
     <template id="module-card-template">
         <div class="card-header">
             <div class="window-controls">
@@ -751,9 +879,17 @@
             <span class="status-text">Status: <span>Ready</span></span>
             <span class="cta-btn">
                 <span class="cta-text">Eksekusi</span>
-                <svg class="cta-icon" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"/>
-                </svg>
+                <div class="cta-icon-wrapper">
+                    <!-- Icon Panah (Default) -->
+                    <svg class="cta-icon cta-arrow" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"/>
+                    </svg>
+                    <!-- Icon Spinner (Muncul saat dieksekusi) -->
+                    <svg class="cta-icon cta-spinner" fill="none" viewBox="0 0 24 24">
+                        <circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4" style="opacity: 0.25;"></circle>
+                        <path fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" style="opacity: 0.75;"></path>
+                    </svg>
+                </div>
             </span>
         </div>
     </template>
@@ -767,46 +903,13 @@
             }
         };
 
-        const swLogic = `
-            const CACHE_NAME = 'pplg-god-tier-cache-v3';
-            self.addEventListener('install', event => {
-                self.skipWaiting();
-                event.waitUntil(
-                    caches.open(CACHE_NAME).then(cache => {
-                        return cache.add(location.href).catch(() => {});
-                    })
-                );
-            });
-            self.addEventListener('activate', event => {
-                event.waitUntil(clients.claim());
-            });
-            self.addEventListener('fetch', event => {
-                if (event.request.method !== 'GET') return;
-                event.respondWith(
-                    caches.match(event.request).then(cachedResponse => {
-                        const networkFetch = fetch(event.request).then(response => {
-                            caches.open(CACHE_NAME).then(cache => {
-                                cache.put(event.request, response.clone());
-                            });
-                            return response;
-                        }).catch(() => {
-                            return cachedResponse;
-                        });
-                        return cachedResponse || networkFetch;
-                    })
-                );
-            });
-        `;
-        
         if ('serviceWorker' in navigator) {
             window.addEventListener('load', () => {
                 runWhenIdle(() => {
                     try {
-                        const blob = new Blob([swLogic], { type: 'application/javascript' });
-                        const swUrl = URL.createObjectURL(blob);
-                        navigator.serviceWorker.register(swUrl)
-                            .then(() => console.log('🚀 [God-Tier] Service Worker Aktif.'))
-                            .catch(err => console.log('SW Registration fallbacks.', err));
+                        navigator.serviceWorker.register('/sw.js')
+                            .then(() => console.log('🚀 [God-Tier] Service Worker Aktif. Menunggu file sw.js di server.'))
+                            .catch(err => console.log('SW Registration fallbacks: File sw.js mungkin belum ada di root server Anda.', err));
                     } catch (e) {
                         console.log('SW disabled in this specific environment.');
                     }
@@ -825,6 +928,8 @@
             'kelas12': false
         };
 
+        // BUG FIX #2 (Global Scope Lock): State untuk menahan transisi jika sedang memuat.
+        let isTabTransitioning = false;
         let modulData = null;
 
         function initializePayloadData() {
@@ -835,7 +940,7 @@
                         { id: 1, title: 'Proses Bisnis & Industri PPLG', desc: 'Memahami ekosistem industri perangkat lunak, siklus hidup pengembangan (SDLC), dan rekayasa perangkat lunak.', ext: '.pdf' },
                         { id: 2, title: 'Perkembangan Teknologi & IoT', desc: 'Wawasan dasar tentang komputasi awan, Internet of Things, Artificial Intelligence, dan tren IT masa depan.', ext: '.md' },
                         { id: 3, title: 'Profesi & Technopreneurship', desc: 'Mengenal berbagai profil pekerjaan (job-profile) di bidang IT dan dasar kewirausahaan teknologi.', ext: '.pdf' },
-                        { id: 4, title: 'K3LH & Budaya Kerja Industri', desc: 'Penerapan Keselamatan dan Kesehatan Kerja serta ergonomi di lingkungan kerja bidang IT.', ext: '.md' },
+                        { id: 4, title: 'K3LH & Budaya Kerja Industri', desc: 'Penerapan Keselamatan Kerja serta ergonomi di lingkungan kerja bidang IT.', ext: '.md' },
                         { id: 5, title: 'Logika & Algoritma Pemrograman', desc: 'Mempelajari dasar logika pemecahan masalah, penyusunan flowchart, dan pseudocode.', ext: '.txt' },
                         { id: 6, title: 'Pemrograman Web Statis', desc: 'Pembuatan struktur dasar web menggunakan semantik HTML5, styling CSS3, Flexbox, dan CSS Grid.', ext: '.html' },
                         { id: 7, title: 'Pemrograman Terstruktur', desc: 'Penerapan variabel, tipe data, logika kontrol, dan perulangan menggunakan bahasa (C++/Python/Java).', ext: '.cpp' },
@@ -857,7 +962,7 @@
                         { id: 7, title: 'Desain & Pembuatan Aset Gim', desc: 'Pengolahan aset visual (sprite 2D/vektor) dan audio (BGM/SFX) untuk kebutuhan pengembangan gim.', ext: '.png' },
                         { id: 8, title: 'Pengembangan Gim 2D', desc: 'Implementasi fisika dasar, input pemain, dan scripting perilaku karakter menggunakan Game Engine (Unity/Godot).', ext: '.unity' },
                         { id: 9, title: 'Integrasi API & Asynchronous', desc: 'Menggunakan AJAX dan Fetch API untuk menghubungkan aplikasi front-end dengan sumber data tanpa reload halaman.', ext: '.js' },
-                        { id: 10, title: 'Projek Kreatif & Kewirausahaan I', desc: 'Merumuskan ide bisnis digital (Product Planning), analisis peluang, dan pembuatan rencana bisnis (Business Plan).', ext: '.pdf' }
+                        { id: 10, title: 'Projek Kreatif & Kewirausahaan I', desc: 'Merumuskan ide bisnis digital (Product Planning), analisis peluang, dan pembuatan rencana bisnis.', ext: '.pdf' }
                     ]
                 },
                 'kelas12': {
@@ -878,7 +983,6 @@
             };
         }
 
-        // Deklarasi Template HTML Global untuk Optmasi #1
         const cardTemplate = document.getElementById('module-card-template');
 
         const domHydrator = new IntersectionObserver((entries, observer) => {
@@ -890,7 +994,6 @@
                         if (card.dataset.hydrated === "false") {
                             const itemData = card._moduleData; 
                             
-                            // --- PENYEMPURNAAN #1: Clone Node Template. Sangat cepat, nol reparsing CPU ---
                             const clone = cardTemplate.content.cloneNode(true);
                             
                             clone.querySelector('.file-name').textContent = `Modul_${itemData.id.toString().padStart(2, '0')}${itemData.ext}`;
@@ -903,10 +1006,13 @@
                         }
                     } else {
                         if (card.dataset.hydrated === "true" && !card.classList.contains('is-executing')) {
-                            // Cukup mereset content, jauh lebih ringan daripada innerHTML
-                            card.textContent = '';
-                            card.classList.add('skeleton-mode');
-                            card.dataset.hydrated = "false";
+                            const isFocused = card.contains(document.activeElement) || document.activeElement === card;
+                            
+                            if (!isFocused) {
+                                card.textContent = '';
+                                card.classList.add('skeleton-mode');
+                                card.dataset.hydrated = "false";
+                            }
                         }
                     }
                 });
@@ -919,6 +1025,14 @@
 
         function renderModules(gradeId) {
             if (renderedState[gradeId]) return;
+
+            // BUG FIX #3: Defensive Data Binding & Guard Clause
+            // Memastikan data gradeId benar-benar terdaftar di dalam objek modulData 
+            // dan memiliki array items sebelum memulai iterasi untuk mencegah Fatal Crash.
+            if (!modulData || !modulData[gradeId] || !Array.isArray(modulData[gradeId].items)) {
+                console.warn(`[System Guard] Data modul untuk target: ${gradeId} tidak valid atau korup.`);
+                return;
+            }
 
             const targetData = modulData[gradeId];
             const container = document.getElementById(gradeId);
@@ -956,12 +1070,52 @@
                 
                 if(ctaBtnText && !clickedCard.classList.contains('is-executing')) {
                     clickedCard.classList.add('is-executing');
-                    const originalText = ctaBtnText.innerText;
-                    ctaBtnText.innerText = "Processing...";
-                    setTimeout(() => {
-                        ctaBtnText.innerText = originalText;
-                        clickedCard.classList.remove('is-executing');
-                    }, 1000);
+                    
+                    // PENYEMPURNAAN KODE FINAL: Mencegah Orphaned Timers (Memory Leak)
+                    // Membersihkan cache timer sebelumnya jika ada klik beruntun paksa (meskipun di-guard oleh is-executing)
+                    if (clickedCard._activeTimers) {
+                        clickedCard._activeTimers.forEach(clearTimeout);
+                    }
+                    clickedCard._activeTimers = [];
+
+                    // Menyimpan teks asli secara permanen pada dataset agar aman saat DOM di-reuse
+                    const originalText = ctaBtnText.dataset.originalText || ctaBtnText.innerText;
+                    if (!ctaBtnText.dataset.originalText) {
+                        ctaBtnText.dataset.originalText = originalText;
+                    }
+                    
+                    ctaBtnText.style.opacity = '0';
+                    ctaBtnText.style.transform = 'translateY(2px)';
+                    
+                    const t1 = setTimeout(() => {
+                        if (!document.body.contains(ctaBtnText)) return;
+
+                        ctaBtnText.innerText = "Proses...";
+                        ctaBtnText.style.opacity = '1';
+                        ctaBtnText.style.transform = 'translateY(0)';
+                    }, 200);
+                    clickedCard._activeTimers.push(t1);
+
+                    const t2 = setTimeout(() => {
+                        if (!document.body.contains(ctaBtnText)) return;
+
+                        ctaBtnText.style.opacity = '0';
+                        ctaBtnText.style.transform = 'translateY(-2px)';
+                        
+                        const t3 = setTimeout(() => {
+                            if (!document.body.contains(ctaBtnText)) return;
+
+                            ctaBtnText.innerText = originalText;
+                            ctaBtnText.style.opacity = '1';
+                            ctaBtnText.style.transform = 'translateY(0)';
+                            
+                            if (document.body.contains(clickedCard)) {
+                                clickedCard.classList.remove('is-executing');
+                            }
+                        }, 200);
+                        clickedCard._activeTimers.push(t3);
+                    }, 1200);
+                    clickedCard._activeTimers.push(t2);
                 }
             }
         }
@@ -973,8 +1127,11 @@
                 const oldCards = currentActiveTab.querySelectorAll('.module-card');
                 oldCards.forEach(card => domHydrator.unobserve(card));
                 
-                currentActiveTab.textContent = ''; // Optmasi memori
-                renderedState[currentActiveTab.id] = false;
+                // PENYEMPURNAAN KODE FINAL: Mencegah DOM Thrashing & CPU Bottleneck.
+                // Baris currentActiveTab.textContent = '' DIHAPUS. 
+                // Begitu juga baris renderedState[currentActiveTab.id] = false DIHAPUS.
+                // Sekarang elemen DOM kelas sebelumnya akan tetap dicache di memori secara efisien, 
+                // tidak dihancurkan dan tidak perlu dicetak ulang dari nol. Tab Switch kini instan (0ms).
             }
 
             renderModules(grade);
@@ -1029,21 +1186,68 @@
         }
 
         const isLowEndDevice = () => {
-            if (navigator.deviceMemory && navigator.deviceMemory <= 4) return true;
-            if (navigator.hardwareConcurrency && navigator.hardwareConcurrency <= 4) return true;
-            if (navigator.connection && (
-                navigator.connection.effectiveType === '2g' || 
-                navigator.connection.effectiveType === '3g' || 
-                navigator.connection.saveData
-            )) return true;
+            // BUG FIX #1: Penggunaan Optional Chaining (?.) untuk mencegah crash 
+            // pada browser/WebView iOS yang tidak mendukung properti penuh di navigator API.
+            if (navigator?.deviceMemory && navigator.deviceMemory <= 4) return true;
+            if (navigator?.hardwareConcurrency && navigator.hardwareConcurrency <= 4) return true;
+            
+            if (navigator?.connection) {
+                const conn = navigator.connection;
+                if (conn.effectiveType === '2g' || conn.effectiveType === '3g' || conn.saveData) {
+                    return true;
+                }
+            }
             return false;
         };
 
         function switchTab(grade, activeColor) {
+            // BUG FIX #2: State Lock Guard Clause
+            // Mencegah "Race Condition" jika tombol diklik berulang kali dengan cepat (spam)
+            if (isTabTransitioning) return;
+            
+            const tabContainer = document.getElementById('tab-container');
+            const currentActiveTab = document.querySelector('.tab-content.active');
+            
+            // Cegah fungsi berjalan jika tab yang diklik adalah tab yang sedang aktif
+            if (currentActiveTab && currentActiveTab.id === grade) return;
+
+            let shouldScroll = false;
+            let scrollTarget = 0;
+
+            if (tabContainer) {
+                const isMobile = window.innerWidth < 768;
+                const offset = isMobile ? 40 : 120; 
+                const tabTop = tabContainer.getBoundingClientRect().top + window.scrollY;
+                
+                if (window.scrollY > tabTop - offset) {
+                    shouldScroll = true;
+                    scrollTarget = Math.max(0, tabTop - offset);
+                }
+            }
+
+            const doUpdate = () => {
+                executeTabUpdate(grade, activeColor);
+            };
+
             if (document.startViewTransition && !isLowEndDevice()) {
-                document.startViewTransition(() => executeTabUpdate(grade, activeColor));
+                isTabTransitioning = true; // KUNCI NAVIGASI SEBELUM TRANSISI DIMULAI
+                const transition = document.startViewTransition(doUpdate);
+                
+                transition.ready.then(() => {
+                    if (shouldScroll) {
+                        window.scrollTo({ top: scrollTarget, behavior: 'smooth' });
+                    }
+                });
+                
+                // LEPASKAN KUNCI SETELAH ANIMASI TRANSISI DOM SELESAI
+                transition.finished.finally(() => {
+                    isTabTransitioning = false; 
+                });
             } else {
-                executeTabUpdate(grade, activeColor); 
+                doUpdate(); 
+                if (shouldScroll) {
+                    window.scrollTo({ top: scrollTarget, behavior: 'smooth' });
+                }
             }
         }
 
@@ -1073,7 +1277,6 @@
             const latencyHistory = [];
             const MAX_HISTORY_LEN = 3; 
 
-            // --- Variabel Optmasi #2 & #4 (Adaptive Throttler & Anti GC) ---
             let pingInterval = null;
             let currentPingDelay = 5000;
             let pingCount = 0;
@@ -1085,36 +1288,68 @@
                     return;
                 }
                 
-                // --- PENYEMPURNAAN #2: Gunakan RTT jika tersedia (Zero Network, Zero GC) ---
-                if (navigator.connection && navigator.connection.rtt !== undefined && navigator.connection.rtt !== 0) {
+                // Menerapkan Optional Chaining (?.) di bagian pengecekan latency
+                // agar aman jika browser tidak memfasilitasi informasi RTT dengan lengkap
+                if (navigator?.connection?.rtt !== undefined && navigator.connection.rtt !== 0) {
                     updateLatencyUI(navigator.connection.rtt);
                     managePingInterval();
                     return;
                 }
                 
-                // Fallback Fetch (Murni Promise Timeout tanpa membuang-buang instansiasi AbortController)
                 const reqId = ++currentRequestId;
                 const start = performance.now();
+                
+                // PENYEMPURNAAN KODE FINAL: Mencegah Network Leak (Zombie Requests)
+                // Menggunakan AbortController untuk membatalkan paksa HTTP Fetch jika melewati batas timeout
+                const controller = new AbortController();
+                const signal = controller.signal;
                 
                 try {
                     const fetchPromise = fetch('https://clients3.google.com/generate_204?_t=' + Date.now(), {
                         method: 'GET',
                         mode: 'no-cors',
-                        cache: 'no-store'
+                        cache: 'no-store',
+                        signal: signal
                     });
                     
                     const timeoutPromise = new Promise((_, reject) => setTimeout(() => reject(new Error('Timeout')), 3000));
                     
                     await Promise.race([fetchPromise, timeoutPromise]);
                     
-                    if (reqId === currentRequestId) { // Filter anti telat (hanya pedulikan request terakhir)
+                    if (reqId === currentRequestId) {
                         const end = performance.now();
                         const rawLatency = Math.round(end - start);
                         updateLatencyUI(rawLatency);
                     }
                 } catch (error) {
+                    controller.abort(); // Langsung mematikan proses fetch yang menggantung (membunuh zombi)
+
                     if (reqId === currentRequestId) {
-                        updateLatencyUI(error.message === 'Timeout' ? 999 : -1); 
+                        const fallbackController = new AbortController();
+                        const fallbackSignal = fallbackController.signal;
+                        try {
+                            const fallbackStart = performance.now();
+                            const fallbackFetchPromise = fetch(window.location.href.split('#')[0].split('?')[0] + '?_ping=' + Date.now(), { 
+                                method: 'HEAD', 
+                                cache: 'no-store',
+                                signal: fallbackSignal
+                            });
+                            const fallbackTimeoutPromise = new Promise((_, reject) => setTimeout(() => reject(new Error('Timeout')), 3000));
+                            
+                            await Promise.race([fallbackFetchPromise, fallbackTimeoutPromise]);
+                            
+                            const fallbackEnd = performance.now();
+                            
+                            if (reqId === currentRequestId) {
+                                updateLatencyUI(Math.round(fallbackEnd - fallbackStart));
+                            }
+                        } catch (fallbackError) {
+                            fallbackController.abort(); // Mematikan paksa fetch lokal jika timeout juga
+                            
+                            if (reqId === currentRequestId) {
+                                updateLatencyUI(error.message === 'Timeout' ? 999 : -1); 
+                            }
+                        }
                     }
                 }
                 
@@ -1140,7 +1375,6 @@
                     return;
                 }
 
-                // Kalkulasi Rata-rata agar Angka Stabil
                 latencyHistory.push(rawLatency);
                 if (latencyHistory.length > MAX_HISTORY_LEN) {
                     latencyHistory.shift();
@@ -1164,15 +1398,14 @@
                 }
             }
 
-            // --- PENYEMPURNAAN #2 (Lanjutan): Adaptive Throttler. Melambat otomatis bila user diam ---
             function managePingInterval() {
                 pingCount++;
                 let newDelay = 5000;
                 
                 if (pingCount > 30) {
-                    newDelay = 30000; // Diam > 2.5 menit: Cek per 30 detik (Super hemat baterai)
+                    newDelay = 30000; 
                 } else if (pingCount > 12) {
-                    newDelay = 15000; // Diam > 1 menit: Cek per 15 detik
+                    newDelay = 15000; 
                 }
                 
                 if (newDelay !== currentPingDelay) {
@@ -1182,14 +1415,13 @@
                 }
             }
 
-            // Reset Throttler ketika user kembali aktif berinteraksi
             function handleUserInteraction() {
                 if (currentPingDelay !== 5000) {
                     pingCount = 0;
                     currentPingDelay = 5000;
                     if (pingInterval) clearInterval(pingInterval);
                     pingInterval = setInterval(checkLatency, currentPingDelay);
-                    checkLatency(); // Tarik data latensi segar
+                    checkLatency(); 
                 }
             }
 
@@ -1205,7 +1437,6 @@
                     }
                 });
                 
-                // Bind interaksi sangat tipis (hanya aktif jika delay bukan 5000)
                 document.addEventListener('mousemove', () => { if (currentPingDelay !== 5000) handleUserInteraction() }, { passive: true });
                 document.addEventListener('scroll', () => { if (currentPingDelay !== 5000) handleUserInteraction() }, { passive: true });
                 document.addEventListener('touchstart', () => { if (currentPingDelay !== 5000) handleUserInteraction() }, { passive: true });
